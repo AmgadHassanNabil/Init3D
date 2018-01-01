@@ -17,3 +17,17 @@ struct VertexPositionColor
 
 	const static UINT numElements = 2;
 };
+
+struct VertexPositionTexture
+{
+	XMFLOAT3 pos;
+	XMFLOAT2 texCoords;
+
+	VertexPositionTexture(float x, float y, float z, float u, float v)
+		: pos(x, y, z), texCoords(u, v)
+	{	}
+
+	const static D3D11_INPUT_ELEMENT_DESC layout[2];
+
+	const static UINT numElements = 2;
+};

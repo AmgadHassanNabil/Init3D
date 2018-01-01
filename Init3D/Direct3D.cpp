@@ -112,7 +112,7 @@ void Direct3D::shutdown()
 	this->d3d11DevCon->Release();
 	this->depthStencilView->Release();
 	this->depthStencilBuffer->Release();
-	this->WireFrame->Release();
+	//this->WireFrame->Release();
 	delete this;
 }
 

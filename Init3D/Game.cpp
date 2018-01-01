@@ -14,49 +14,76 @@ bool Game::initialize(UINT width, UINT height)
 	this->width = width;
 	this->height = height;
 
-	VertexPositionColor quadVerticies[] =
+	VertexPositionTexture cubeVerticies[] =
 	{
-		VertexPositionColor(-1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f),
-		VertexPositionColor(-1.0f, +1.0f, -1.0f, 0.0f, 1.0f, 0.0f),
-		VertexPositionColor(+1.0f, +1.0f, -1.0f, 0.0f, 0.0f, 1.0f),
-		VertexPositionColor(+1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 0.0f),
-		VertexPositionColor(-1.0f, -1.0f, +1.0f, 0.0f, 1.0f, 1.0f),
-		VertexPositionColor(-1.0f, +1.0f, +1.0f, 1.0f, 1.0f, 1.0f),
-		VertexPositionColor(+1.0f, +1.0f, +1.0f, 1.0f, 0.0f, 1.0f),
-		VertexPositionColor(+1.0f, -1.0f, +1.0f, 1.0f, 0.0f, 0.0f),
+		// Front Face
+		VertexPositionTexture(-1.0f, -1.0f, -1.0f, 0.0f, 1.0f),
+		VertexPositionTexture(-1.0f,  1.0f, -1.0f, 0.0f, 0.0f),
+		VertexPositionTexture(1.0f,  1.0f, -1.0f, 1.0f, 0.0f),
+		VertexPositionTexture(1.0f, -1.0f, -1.0f, 1.0f, 1.0f),
+
+		// Back Face
+		VertexPositionTexture(-1.0f, -1.0f, 1.0f, 1.0f, 1.0f),
+		VertexPositionTexture(1.0f, -1.0f, 1.0f, 0.0f, 1.0f),
+		VertexPositionTexture(1.0f,  1.0f, 1.0f, 0.0f, 0.0f),
+		VertexPositionTexture(-1.0f,  1.0f, 1.0f, 1.0f, 0.0f),
+
+		// Top Face
+		VertexPositionTexture(-1.0f, 1.0f, -1.0f, 0.0f, 1.0f),
+		VertexPositionTexture(-1.0f, 1.0f,  1.0f, 0.0f, 0.0f),
+		VertexPositionTexture(1.0f, 1.0f,  1.0f, 1.0f, 0.0f),
+		VertexPositionTexture(1.0f, 1.0f, -1.0f, 1.0f, 1.0f),
+
+		// Bottom Face
+		VertexPositionTexture(-1.0f, -1.0f, -1.0f, 1.0f, 1.0f),
+		VertexPositionTexture(1.0f, -1.0f, -1.0f, 0.0f, 1.0f),
+		VertexPositionTexture(1.0f, -1.0f,  1.0f, 0.0f, 0.0f),
+		VertexPositionTexture(-1.0f, -1.0f,  1.0f, 1.0f, 0.0f),
+
+		// Left Face
+		VertexPositionTexture(-1.0f, -1.0f,  1.0f, 0.0f, 1.0f),
+		VertexPositionTexture(-1.0f,  1.0f,  1.0f, 0.0f, 0.0f),
+		VertexPositionTexture(-1.0f,  1.0f, -1.0f, 1.0f, 0.0f),
+		VertexPositionTexture(-1.0f, -1.0f, -1.0f, 1.0f, 1.0f),
+
+		// Right Face
+		VertexPositionTexture(1.0f, -1.0f, -1.0f, 0.0f, 1.0f),
+		VertexPositionTexture(1.0f,  1.0f, -1.0f, 0.0f, 0.0f),
+		VertexPositionTexture(1.0f,  1.0f,  1.0f, 1.0f, 0.0f),
+		VertexPositionTexture(1.0f, -1.0f,  1.0f, 1.0f, 1.0f),
 	};
 
 	DWORD indices[] = {
-		// front face
-		0, 1, 2,
-		0, 2, 3,
+		// Front Face
+		0,  1,  2,
+		0,  2,  3,
 
-		// back face
-		4, 6, 5,
-		4, 7, 6,
+		// Back Face
+		4,  5,  6,
+		4,  6,  7,
 
-		// left face
-		4, 5, 1,
-		4, 1, 0,
+		// Top Face
+		8,  9, 10,
+		8, 10, 11,
 
-		// right face
-		3, 2, 6,
-		3, 6, 7,
+		// Bottom Face
+		12, 13, 14,
+		12, 14, 15,
 
-		// top face
-		1, 5, 6,
-		1, 6, 2,
+		// Left Face
+		16, 17, 18,
+		16, 18, 19,
 
-		// bottom face
-		4, 0, 3,
-		4, 3, 7
+		// Right Face
+		20, 21, 22,
+		20, 22, 23
 	};
 
 	HRESULT hr;
 	
-	hr = CompileShader(L"Effects.fx", "VS", "vs_5_0", &VS_Buffer);
+	hr = CompileShader(L"TexturedEffect.fx", "VS", "vs_5_0", &VS_Buffer);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "VertexShader Loading - Failed", "Error");
-	hr = CompileShader(L"Effects.fx", "PS", "ps_5_0", &PS_Buffer);
+	hr = CompileShader(L"TexturedEffect.fx", "PS", "ps_5_0", &PS_Buffer);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "PixelShader Loading - Failed", "Error");
 
 	hr = D3DINST->d3d11Device->CreateVertexShader(VS_Buffer->GetBufferPointer(), VS_Buffer->GetBufferSize(), NULL, &VS);
@@ -68,7 +95,7 @@ bool Game::initialize(UINT width, UINT height)
 	ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
 
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(VertexPositionColor) * 8;
+	vertexBufferDesc.ByteWidth = sizeof(VertexPositionTexture) * 24;
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = 0;
 	vertexBufferDesc.MiscFlags = 0;
@@ -76,8 +103,9 @@ bool Game::initialize(UINT width, UINT height)
 	D3D11_SUBRESOURCE_DATA vertexBufferData;
 
 	ZeroMemory(&vertexBufferData, sizeof(vertexBufferData));
-	vertexBufferData.pSysMem = quadVerticies;
-	hr = D3DINST->d3d11Device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &quadVertBuffer);
+	vertexBufferData.pSysMem = cubeVerticies;
+	hr = D3DINST->d3d11Device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &cubeVertBuffer);
+	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Vertex Buffer Creation - Failed", "Error");
 
 	D3D11_BUFFER_DESC indexBufferDesc;
 	ZeroMemory(&indexBufferDesc, sizeof(indexBufferDesc));
@@ -89,10 +117,12 @@ bool Game::initialize(UINT width, UINT height)
 
 	D3D11_SUBRESOURCE_DATA iinitData;
 	iinitData.pSysMem = indices;
-	hr = D3DINST->d3d11Device->CreateBuffer(&indexBufferDesc, &iinitData, &quadIndexBuffer);
+	hr = D3DINST->d3d11Device->CreateBuffer(&indexBufferDesc, &iinitData, &cubeIndexBuffer);
+	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Index Buffer Creation - Failed", "Error");
 
-	D3DINST->d3d11Device->CreateInputLayout(VertexPositionColor::layout, VertexPositionColor::numElements, VS_Buffer->GetBufferPointer(),
-		VS_Buffer->GetBufferSize(), &vertLayout);	
+	hr = D3DINST->d3d11Device->CreateInputLayout(VertexPositionTexture::layout, VertexPositionTexture::numElements, VS_Buffer->GetBufferPointer(),
+		VS_Buffer->GetBufferSize(), &vertLayout);
+	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Input Layout Creation - Failed", "Error");
 
 	D3D11_BUFFER_DESC cbbd;
 	ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
@@ -102,9 +132,24 @@ bool Game::initialize(UINT width, UINT height)
 	cbbd.CPUAccessFlags = 0;
 	cbbd.MiscFlags = 0;
 	hr = D3DINST->d3d11Device->CreateBuffer(&cbbd, NULL, &cbPerObjectBuffer);
+	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Constant Buffer Creation - Failed", "Error");
 
 	camProjection = XMMatrixPerspectiveFovLH(0.4f*3.14f, (float)width / height, 1.0f, 1000.0f);
 	
+	D3D11_SAMPLER_DESC sampDesc;
+	ZeroMemory(&sampDesc, sizeof(sampDesc));
+	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	sampDesc.MinLOD = 0;
+	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	hr = D3DINST->d3d11Device->CreateSamplerState(&sampDesc, &CubesTexSamplerState);
+	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Sampler State Creation - Failed", "Error");
+
+	hr = CreateWICTextureFromFile(D3DINST->d3d11Device, L"Content/Textures/braynzar.jpg", nullptr, &CubesTexture);
+	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Loading Texture - Failed", "Error");
 
 	return true;
 }
@@ -142,13 +187,16 @@ void Game::draw()
 	cbPerObj.WVP = XMMatrixTranspose(WVP);
 	D3DINST->d3d11DevCon->UpdateSubresource(cbPerObjectBuffer, 0, NULL, &cbPerObj, 0, 0);
 	D3DINST->d3d11DevCon->VSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
+	D3DINST->d3d11DevCon->PSSetShaderResources(0, 1, &CubesTexture);
+	D3DINST->d3d11DevCon->PSSetSamplers(0, 1, &CubesTexSamplerState);
+
 	D3DINST->d3d11DevCon->VSSetShader(VS, NULL, NULL);
 	D3DINST->d3d11DevCon->PSSetShader(PS, NULL, NULL);
 
-	UINT stride = sizeof(VertexPositionColor);
+	UINT stride = sizeof(VertexPositionTexture);
 	UINT offset = 0;
-	D3DINST->d3d11DevCon->IASetVertexBuffers(0, 1, &quadVertBuffer, &stride, &offset);
-	D3DINST->d3d11DevCon->IASetIndexBuffer(quadIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	D3DINST->d3d11DevCon->IASetVertexBuffers(0, 1, &cubeVertBuffer, &stride, &offset);
+	D3DINST->d3d11DevCon->IASetIndexBuffer(cubeIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 	D3DINST->d3d11DevCon->IASetInputLayout(vertLayout);
 
@@ -163,12 +211,14 @@ void Game::release()
 {
 	VS_Buffer->Release();
 	PS_Buffer->Release();
-	quadVertBuffer->Release();
-	quadIndexBuffer->Release();
+	cubeVertBuffer->Release();
+	cubeIndexBuffer->Release();
 	vertLayout->Release();
 	VS->Release();
 	PS->Release();
 	cbPerObjectBuffer->Release();
+	CubesTexSamplerState->Release();
+	CubesTexture->Release();
 	delete this;
 }
 
