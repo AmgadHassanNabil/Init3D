@@ -5,14 +5,17 @@
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
 #include <D3Dcompiler.h>
+#include <dinput.h>
 
 #include "Direct3D.h"
 #include "Game.h"
 #include "Vertices.h"
 #include "WICTextureLoader.h"
+#include "Input.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
+#pragma comment (lib, "dinput8.lib")
 
 #define SHOW_AND_RETURN_ERROR_ON_FAIL(hr, errMsg, errTitle)		if (FAILED(hr))											\
 																{														\
@@ -20,4 +23,5 @@
 																	return false;										\
 																}
 
-#define	D3DINST	Direct3D::getInstance()
+#define	AMD3D	Direct3D::getInstance()
+#define AMINPUT	Input::getInstance()

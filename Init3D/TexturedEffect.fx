@@ -4,7 +4,13 @@ cbuffer cbPerObject
 };
 
 Texture2D ObjTexture;
-SamplerState ObjSamplerState;
+SamplerState ObjSamplerState 
+{
+	Filter = ANISOTROPIC;
+	MaxAnisotropy = 4;
+	AddressU = WRAP;
+	AddressV = WRAP;
+};
 
 struct VS_OUTPUT
 {

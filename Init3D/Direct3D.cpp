@@ -1,5 +1,7 @@
 #include "Direct3D.h"
 
+//#include<stdio.h>
+
 Direct3D* Direct3D::instance;
 
 Direct3D::Direct3D()
@@ -17,7 +19,7 @@ Direct3D * Direct3D::getInstance()
 bool Direct3D::initialize(HWND hwnd, HINSTANCE hInstance, const int width, const int height)
 {
 	HRESULT hr;
-	
+
 	DXGI_MODE_DESC bufferDesc;
 
 	ZeroMemory(&bufferDesc, sizeof(DXGI_MODE_DESC));
@@ -35,7 +37,7 @@ bool Direct3D::initialize(HWND hwnd, HINSTANCE hInstance, const int width, const
 	ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
 
 	swapChainDesc.BufferDesc = bufferDesc;
-	swapChainDesc.SampleDesc.Count = 1;
+	swapChainDesc.SampleDesc.Count = 4;
 	swapChainDesc.SampleDesc.Quality = 0;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.BufferCount = 1;
@@ -45,6 +47,20 @@ bool Direct3D::initialize(HWND hwnd, HINSTANCE hInstance, const int width, const
 
 	hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, NULL, NULL,
 		D3D11_SDK_VERSION, &swapChainDesc, &SwapChain, &d3d11Device, NULL, &d3d11DevCon);
+
+
+	/*for (int i = 1; i < 33; i++)
+	{
+		UINT quality = 0;
+		hr = d3d11Device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, i, &quality);
+
+		if (quality > 1)
+		{
+			char str[50];
+			sprintf_s(str, "Multisampling is working with: %d and quality: %d", i, quality);
+			OutputDebugStringA(str);
+		}
+	}*/
 
 	if (FAILED(hr))
 		return false;
@@ -69,7 +85,7 @@ bool Direct3D::initialize(HWND hwnd, HINSTANCE hInstance, const int width, const
 	depthStencilDesc.MipLevels = 1;
 	depthStencilDesc.ArraySize = 1;
 	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthStencilDesc.SampleDesc.Count = 1;
+	depthStencilDesc.SampleDesc.Count = 4;
 	depthStencilDesc.SampleDesc.Quality = 0;
 	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
 	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
@@ -77,7 +93,11 @@ bool Direct3D::initialize(HWND hwnd, HINSTANCE hInstance, const int width, const
 	depthStencilDesc.MiscFlags = 0;
 
 	d3d11Device->CreateTexture2D(&depthStencilDesc, NULL, &depthStencilBuffer);
-	d3d11Device->CreateDepthStencilView(depthStencilBuffer, NULL, &depthStencilView);
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC pD;
+	ZeroMemory(&pD, sizeof(pD));
+	pD.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+	d3d11Device->CreateDepthStencilView(depthStencilBuffer, &pD, &depthStencilView);
 
 	d3d11DevCon->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
 

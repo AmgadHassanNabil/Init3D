@@ -23,11 +23,17 @@ int WINAPI WinMain(HINSTANCE hInstance,	HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		MessageBox(0, "Game Initialization - Failed", "Error", MB_OK);
 		return 0;
 	}
+	if (!Input::getInstance()->initDirectInput(hwnd, hInstance))
+	{
+		MessageBox(0, "Direct Input Initialization - Failed", "Error", MB_OK);
+		return 0;
+	}
 
 	messageloop();
 
 	Game::getInstance()->release();
 	Direct3D::getInstance()->shutdown();
+	Input::getInstance()->release();
 
 	return 0;
 }
@@ -85,6 +91,8 @@ int messageloop()
 {
 	MSG msg;
 	ZeroMemory(&msg, sizeof(MSG));
+	DIMOUSESTATE mouseCurrState;
+	
 
 	while (true)
 	{
@@ -98,8 +106,11 @@ int messageloop()
 		}
 		else
 		{
-			Game::getInstance()->update();
+			BYTE currKeyboardState[256];
+			Input::getInstance()->detectInput(mouseCurrState, currKeyboardState);
+			Game::getInstance()->update(mouseCurrState, currKeyboardState);
 			Game::getInstance()->draw();
+			Input::getInstance()->setLastStates(mouseCurrState, currKeyboardState);
 		}
 	}
 

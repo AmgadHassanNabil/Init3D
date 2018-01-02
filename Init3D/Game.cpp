@@ -86,9 +86,9 @@ bool Game::initialize(UINT width, UINT height)
 	hr = CompileShader(L"TexturedEffect.fx", "PS", "ps_5_0", &PS_Buffer);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "PixelShader Loading - Failed", "Error");
 
-	hr = D3DINST->d3d11Device->CreateVertexShader(VS_Buffer->GetBufferPointer(), VS_Buffer->GetBufferSize(), NULL, &VS);
+	hr = AMD3D->d3d11Device->CreateVertexShader(VS_Buffer->GetBufferPointer(), VS_Buffer->GetBufferSize(), NULL, &VS);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "VertexShader Creating - Failed", "Error");
-	hr = D3DINST->d3d11Device->CreatePixelShader(PS_Buffer->GetBufferPointer(), PS_Buffer->GetBufferSize(), NULL, &PS);
+	hr = AMD3D->d3d11Device->CreatePixelShader(PS_Buffer->GetBufferPointer(), PS_Buffer->GetBufferSize(), NULL, &PS);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "PixelShader Creating - Failed", "Error");
 
 	D3D11_BUFFER_DESC vertexBufferDesc;
@@ -104,7 +104,7 @@ bool Game::initialize(UINT width, UINT height)
 
 	ZeroMemory(&vertexBufferData, sizeof(vertexBufferData));
 	vertexBufferData.pSysMem = cubeVerticies;
-	hr = D3DINST->d3d11Device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &cubeVertBuffer);
+	hr = AMD3D->d3d11Device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &cubeVertBuffer);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Vertex Buffer Creation - Failed", "Error");
 
 	D3D11_BUFFER_DESC indexBufferDesc;
@@ -117,10 +117,10 @@ bool Game::initialize(UINT width, UINT height)
 
 	D3D11_SUBRESOURCE_DATA iinitData;
 	iinitData.pSysMem = indices;
-	hr = D3DINST->d3d11Device->CreateBuffer(&indexBufferDesc, &iinitData, &cubeIndexBuffer);
+	hr = AMD3D->d3d11Device->CreateBuffer(&indexBufferDesc, &iinitData, &cubeIndexBuffer);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Index Buffer Creation - Failed", "Error");
 
-	hr = D3DINST->d3d11Device->CreateInputLayout(VertexPositionTexture::layout, VertexPositionTexture::numElements, VS_Buffer->GetBufferPointer(),
+	hr = AMD3D->d3d11Device->CreateInputLayout(VertexPositionTexture::layout, VertexPositionTexture::numElements, VS_Buffer->GetBufferPointer(),
 		VS_Buffer->GetBufferSize(), &vertLayout);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Input Layout Creation - Failed", "Error");
 
@@ -131,24 +131,24 @@ bool Game::initialize(UINT width, UINT height)
 	cbbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	cbbd.CPUAccessFlags = 0;
 	cbbd.MiscFlags = 0;
-	hr = D3DINST->d3d11Device->CreateBuffer(&cbbd, NULL, &cbPerObjectBuffer);
+	hr = AMD3D->d3d11Device->CreateBuffer(&cbbd, NULL, &cbPerObjectBuffer);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Constant Buffer Creation - Failed", "Error");
 
 	camProjection = XMMatrixPerspectiveFovLH(0.4f*3.14f, (float)width / height, 1.0f, 1000.0f);
 	
-	D3D11_SAMPLER_DESC sampDesc;
-	ZeroMemory(&sampDesc, sizeof(sampDesc));
-	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-	sampDesc.MinLOD = 0;
-	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-	hr = D3DINST->d3d11Device->CreateSamplerState(&sampDesc, &CubesTexSamplerState);
-	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Sampler State Creation - Failed", "Error");
+	//D3D11_SAMPLER_DESC sampDesc;
+	//ZeroMemory(&sampDesc, sizeof(sampDesc));
+	//sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	//sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	//sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	//sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	//sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	//sampDesc.MinLOD = 0;
+	//sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	//hr = AMD3D->d3d11Device->CreateSamplerState(&sampDesc, &CubesTexSamplerState);
+	//SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Sampler State Creation - Failed", "Error");
 
-	hr = CreateWICTextureFromFile(D3DINST->d3d11Device, L"Content/Textures/braynzar.jpg", nullptr, &CubesTexture);
+	hr = CreateWICTextureFromFile(AMD3D->d3d11Device, L"braynzar.jpg", nullptr, &CubesTexture);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Loading Texture - Failed", "Error");
 
 	return true;
@@ -158,7 +158,7 @@ float yRotate = -XM_2PI;
 //float zCamOffset = 8.0f;
 //int zCamOffsetSign = 1;
 
-void Game::update()
+void Game::update(DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[])
 {
 	camPosition = XMVectorSet(0.0f, 3.0f, -8.0f, 0.0f);
 	camTarget = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
@@ -167,7 +167,11 @@ void Game::update()
 	camView = XMMatrixLookAtLH(camPosition, camTarget, camUp);
 	World = XMMatrixRotationY(yRotate);
 
-	yRotate += (XM_2PI / 5000.0f);
+
+	if(mouseCurrState.rgbButtons[0] & 0x80)
+		yRotate += (XM_2PI / 5000.0f);
+	if (mouseCurrState.rgbButtons[1] & 0x80)
+		yRotate -= (XM_2PI / 5000.0f);
 	//zCamOffset += (zCamOffsetSign * 0.001f);
 	//if (zCamOffset > 5 || zCamOffset < 0.5f)
 	//	zCamOffsetSign *= -1;
@@ -175,8 +179,8 @@ void Game::update()
 
 void Game::draw()
 {
-	D3DINST->d3d11DevCon->ClearRenderTargetView(D3DINST->renderTargetView, bgColor);
-	D3DINST->d3d11DevCon->ClearDepthStencilView(D3DINST->depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	AMD3D->d3d11DevCon->ClearRenderTargetView(AMD3D->renderTargetView, bgColor);
+	AMD3D->d3d11DevCon->ClearDepthStencilView(AMD3D->depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 
 #ifdef _WIN64
@@ -185,26 +189,26 @@ void Game::draw()
 	WVP = World * camView * camProjection
 #endif
 	cbPerObj.WVP = XMMatrixTranspose(WVP);
-	D3DINST->d3d11DevCon->UpdateSubresource(cbPerObjectBuffer, 0, NULL, &cbPerObj, 0, 0);
-	D3DINST->d3d11DevCon->VSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
-	D3DINST->d3d11DevCon->PSSetShaderResources(0, 1, &CubesTexture);
-	D3DINST->d3d11DevCon->PSSetSamplers(0, 1, &CubesTexSamplerState);
+	AMD3D->d3d11DevCon->UpdateSubresource(cbPerObjectBuffer, 0, NULL, &cbPerObj, 0, 0);
+	AMD3D->d3d11DevCon->VSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
+	AMD3D->d3d11DevCon->PSSetShaderResources(0, 1, &CubesTexture);
+	//AMD3D->d3d11DevCon->PSSetSamplers(0, 1, &CubesTexSamplerState);
 
-	D3DINST->d3d11DevCon->VSSetShader(VS, NULL, NULL);
-	D3DINST->d3d11DevCon->PSSetShader(PS, NULL, NULL);
+	AMD3D->d3d11DevCon->VSSetShader(VS, NULL, NULL);
+	AMD3D->d3d11DevCon->PSSetShader(PS, NULL, NULL);
 
 	UINT stride = sizeof(VertexPositionTexture);
 	UINT offset = 0;
-	D3DINST->d3d11DevCon->IASetVertexBuffers(0, 1, &cubeVertBuffer, &stride, &offset);
-	D3DINST->d3d11DevCon->IASetIndexBuffer(cubeIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	AMD3D->d3d11DevCon->IASetVertexBuffers(0, 1, &cubeVertBuffer, &stride, &offset);
+	AMD3D->d3d11DevCon->IASetIndexBuffer(cubeIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-	D3DINST->d3d11DevCon->IASetInputLayout(vertLayout);
+	AMD3D->d3d11DevCon->IASetInputLayout(vertLayout);
 
-	D3DINST->d3d11DevCon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	AMD3D->d3d11DevCon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	D3DINST->d3d11DevCon->DrawIndexed(36, 0, 0);
+	AMD3D->d3d11DevCon->DrawIndexed(36, 0, 0);
 
-	D3DINST->SwapChain->Present(0, 0);
+	AMD3D->SwapChain->Present(0, 0);
 }
 
 void Game::release()
@@ -217,7 +221,7 @@ void Game::release()
 	VS->Release();
 	PS->Release();
 	cbPerObjectBuffer->Release();
-	CubesTexSamplerState->Release();
+	//CubesTexSamplerState->Release();
 	CubesTexture->Release();
 	delete this;
 }

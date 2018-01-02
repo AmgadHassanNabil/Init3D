@@ -13,12 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Content">
-      <UniqueIdentifier>{bb749fe9-6f95-4da3-a278-43004a233d3b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Content\Textures">
-      <UniqueIdentifier>{7dd44cd5-de72-4fe7-924c-ab4a50cf5fca}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -31,6 +25,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Vertices.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,6 +47,9 @@
     <ClInclude Include="Vertices.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Effects.fx">
@@ -61,10 +61,5 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\..\..\..\OneDrive\Desktop\braynzar.jpg">
-      <Filter>Content\Textures</Filter>
-    </Image>
   </ItemGroup>
 </Project>

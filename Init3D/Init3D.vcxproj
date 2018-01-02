@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClCompile Include="Direct3D.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="Vertices.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
@@ -160,6 +161,7 @@
     <ClInclude Include="Direct3D.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Headers.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="Vertices.h" />
     <ClInclude Include="WinMain.h" />
   </ItemGroup>
@@ -183,11 +185,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\..\..\..\OneDrive\Desktop\braynzar.jpg">
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-    </Image>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

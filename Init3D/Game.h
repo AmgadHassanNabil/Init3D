@@ -47,7 +47,7 @@ private:
 
 public:
 	bool initialize(UINT, UINT);
-	void update();
+	void update(DIMOUSESTATE, BYTE[]);
 	void draw();
 	void release();
 
