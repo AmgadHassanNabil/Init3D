@@ -6,6 +6,20 @@ HWND hwnd = NULL;
 const int Width = 800;
 const int Height = 600;
 
+
+double countsPerSecond = 0.0;
+__int64 CounterStart = 0;
+
+int frameCount = 0;
+int fps = 0;
+
+__int64 frameTimeOld = 0;
+double frameTime;
+
+void StartTimer();
+double GetTime();
+double GetFrameTime();
+
 int WINAPI WinMain(HINSTANCE hInstance,	HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 	if (!InitializeWindow(hInstance, nShowCmd, Width, Height, true))
@@ -108,8 +122,19 @@ int messageloop()
 		{
 			BYTE currKeyboardState[256];
 			Input::getInstance()->detectInput(mouseCurrState, currKeyboardState);
-			Game::getInstance()->update(mouseCurrState, currKeyboardState);
-			Game::getInstance()->draw();
+
+			frameCount++;
+			if (GetTime() > 1.0f)
+			{
+				fps = frameCount;
+				frameCount = 0;
+				StartTimer();
+			}
+
+			frameTime = GetFrameTime();
+
+			Game::getInstance()->update(frameTime, mouseCurrState, currKeyboardState);
+			Game::getInstance()->draw(fps);
 			Input::getInstance()->setLastStates(mouseCurrState, currKeyboardState);
 		}
 	}
@@ -136,4 +161,36 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			return 0;
 	}
 	return DefWindowProc(hwnd, msg,	wParam,	lParam);
+}
+inline void StartTimer()
+{
+	LARGE_INTEGER frequencyCount;
+	QueryPerformanceFrequency(&frequencyCount);
+
+	countsPerSecond = double(frequencyCount.QuadPart);
+
+	QueryPerformanceCounter(&frequencyCount);
+	CounterStart = frequencyCount.QuadPart;
+}
+
+inline double GetTime()
+{
+	LARGE_INTEGER currentTime;
+	QueryPerformanceCounter(&currentTime);
+	return double(currentTime.QuadPart - CounterStart) / countsPerSecond;
+}
+
+inline double GetFrameTime()
+{
+	LARGE_INTEGER currentTime;
+	__int64 tickCount;
+	QueryPerformanceCounter(&currentTime);
+
+	tickCount = currentTime.QuadPart - frameTimeOld;
+	frameTimeOld = currentTime.QuadPart;
+
+	if (tickCount < 0.0f)
+		tickCount = 0.0f;
+
+	return float(tickCount) / countsPerSecond;
 }

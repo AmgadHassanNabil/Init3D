@@ -6,6 +6,7 @@ using namespace DirectX;
 class Game
 {
 private:
+
 	const FLOAT bgColor[4] = { 0.0f, 0.0f, 0.7f, 1.0f };
 	UINT width, height;
 
@@ -43,12 +44,14 @@ private:
 	Game& operator=(const Game&);
 	~Game();
 
+	
+
 	static Game* instance;
 
 public:
 	bool initialize(UINT, UINT);
-	void update(DIMOUSESTATE, BYTE[]);
-	void draw();
+	void update(const double& time, DIMOUSESTATE, BYTE[]);
+	void draw(const int&);
 	void release();
 
 	static Game* getInstance();

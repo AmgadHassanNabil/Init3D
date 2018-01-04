@@ -158,7 +158,7 @@ float yRotate = -XM_2PI;
 //float zCamOffset = 8.0f;
 //int zCamOffsetSign = 1;
 
-void Game::update(DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[])
+void Game::update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[])
 {
 	camPosition = XMVectorSet(0.0f, 3.0f, -8.0f, 0.0f);
 	camTarget = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
@@ -169,15 +169,15 @@ void Game::update(DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[])
 
 
 	if(mouseCurrState.rgbButtons[0] & 0x80)
-		yRotate += (XM_2PI / 5000.0f);
+		yRotate += (XM_2PI) * time;
 	if (mouseCurrState.rgbButtons[1] & 0x80)
-		yRotate -= (XM_2PI / 5000.0f);
+		yRotate -= (XM_2PI) * time;
 	//zCamOffset += (zCamOffsetSign * 0.001f);
 	//if (zCamOffset > 5 || zCamOffset < 0.5f)
 	//	zCamOffsetSign *= -1;
 }
 
-void Game::draw()
+void Game::draw(const int& fps)
 {
 	AMD3D->d3d11DevCon->ClearRenderTargetView(AMD3D->renderTargetView, bgColor);
 	AMD3D->d3d11DevCon->ClearDepthStencilView(AMD3D->depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -236,6 +236,8 @@ Game * Game::getInstance()
 Game::~Game()
 {
 }
+
+
 
 HRESULT CompileShader(_In_ LPCWSTR srcFile, _In_ LPCSTR entryPoint, _In_ LPCSTR profile, _Outptr_ ID3DBlob** blob)
 {
