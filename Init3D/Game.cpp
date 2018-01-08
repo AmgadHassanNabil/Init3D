@@ -14,43 +14,43 @@ bool Game::initialize(UINT width, UINT height)
 	this->width = width;
 	this->height = height;
 
-	VertexPositionTexture cubeVerticies[] =
+	VertexPositionNormalTexture cubeVerticies[] =
 	{
 		// Front Face
-		VertexPositionTexture(-1.0f, -1.0f, -1.0f, 0.0f, 1.0f),
-		VertexPositionTexture(-1.0f,  1.0f, -1.0f, 0.0f, 0.0f),
-		VertexPositionTexture(1.0f,  1.0f, -1.0f, 1.0f, 0.0f),
-		VertexPositionTexture(1.0f, -1.0f, -1.0f, 1.0f, 1.0f),
+		VertexPositionNormalTexture(-1.0f, -1.0f, -1.0f, 0.0f, 1.0f,-1.0f, -1.0f, -1.0f),
+		VertexPositionNormalTexture(-1.0f,  1.0f, -1.0f, 0.0f, 0.0f,-1.0f,  1.0f, -1.0f),
+		VertexPositionNormalTexture(1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 1.0f,  1.0f, -1.0f),
+		VertexPositionNormalTexture(1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, -1.0f, -1.0f),
 
 		// Back Face
-		VertexPositionTexture(-1.0f, -1.0f, 1.0f, 1.0f, 1.0f),
-		VertexPositionTexture(1.0f, -1.0f, 1.0f, 0.0f, 1.0f),
-		VertexPositionTexture(1.0f,  1.0f, 1.0f, 0.0f, 0.0f),
-		VertexPositionTexture(-1.0f,  1.0f, 1.0f, 1.0f, 0.0f),
+		VertexPositionNormalTexture(-1.0f, -1.0f, 1.0f, 1.0f, 1.0f,-1.0f, -1.0f, 1.0f),
+		VertexPositionNormalTexture(1.0f, -1.0f, 1.0f, 0.0f, 1.0f,  1.0f, -1.0f, 1.0f),
+		VertexPositionNormalTexture(1.0f,  1.0f, 1.0f, 0.0f, 0.0f,  1.0f,  1.0f, 1.0f),
+		VertexPositionNormalTexture(-1.0f,  1.0f, 1.0f, 1.0f, 0.0f,-1.0f,  1.0f, 1.0f),
 
 		// Top Face
-		VertexPositionTexture(-1.0f, 1.0f, -1.0f, 0.0f, 1.0f),
-		VertexPositionTexture(-1.0f, 1.0f,  1.0f, 0.0f, 0.0f),
-		VertexPositionTexture(1.0f, 1.0f,  1.0f, 1.0f, 0.0f),
-		VertexPositionTexture(1.0f, 1.0f, -1.0f, 1.0f, 1.0f),
+		VertexPositionNormalTexture(-1.0f, 1.0f, -1.0f, 0.0f, 1.0f,-1.0f, 1.0f, -1.0f),
+		VertexPositionNormalTexture(-1.0f, 1.0f,  1.0f, 0.0f, 0.0f,-1.0f, 1.0f,  1.0f),
+		VertexPositionNormalTexture(1.0f, 1.0f,  1.0f, 1.0f, 0.0f,  1.0f, 1.0f,  1.0f),
+		VertexPositionNormalTexture(1.0f, 1.0f, -1.0f, 1.0f, 1.0f,  1.0f, 1.0f, -1.0f),
 
 		// Bottom Face
-		VertexPositionTexture(-1.0f, -1.0f, -1.0f, 1.0f, 1.0f),
-		VertexPositionTexture(1.0f, -1.0f, -1.0f, 0.0f, 1.0f),
-		VertexPositionTexture(1.0f, -1.0f,  1.0f, 0.0f, 0.0f),
-		VertexPositionTexture(-1.0f, -1.0f,  1.0f, 1.0f, 0.0f),
+		VertexPositionNormalTexture(-1.0f, -1.0f, -1.0f, 1.0f, 1.0f,-1.0f, -1.0f, -1.0f),
+		VertexPositionNormalTexture(1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, -1.0f, -1.0f),
+		VertexPositionNormalTexture(1.0f, -1.0f,  1.0f, 0.0f, 0.0f, 1.0f, -1.0f,  1.0f),
+		VertexPositionNormalTexture(-1.0f, -1.0f,  1.0f, 1.0f, 0.0f,-1.0f, -1.0f,  1.0f),
 
 		// Left Face
-		VertexPositionTexture(-1.0f, -1.0f,  1.0f, 0.0f, 1.0f),
-		VertexPositionTexture(-1.0f,  1.0f,  1.0f, 0.0f, 0.0f),
-		VertexPositionTexture(-1.0f,  1.0f, -1.0f, 1.0f, 0.0f),
-		VertexPositionTexture(-1.0f, -1.0f, -1.0f, 1.0f, 1.0f),
+		VertexPositionNormalTexture(-1.0f, -1.0f,  1.0f, 0.0f, 1.0f,-1.0f, -1.0f,  1.0f),
+		VertexPositionNormalTexture(-1.0f,  1.0f,  1.0f, 0.0f, 0.0f,-1.0f,  1.0f,  1.0f),
+		VertexPositionNormalTexture(-1.0f,  1.0f, -1.0f, 1.0f, 0.0f,-1.0f,  1.0f, -1.0f),
+		VertexPositionNormalTexture(-1.0f, -1.0f, -1.0f, 1.0f, 1.0f,-1.0f, -1.0f, -1.0f),
 
 		// Right Face
-		VertexPositionTexture(1.0f, -1.0f, -1.0f, 0.0f, 1.0f),
-		VertexPositionTexture(1.0f,  1.0f, -1.0f, 0.0f, 0.0f),
-		VertexPositionTexture(1.0f,  1.0f,  1.0f, 1.0f, 0.0f),
-		VertexPositionTexture(1.0f, -1.0f,  1.0f, 1.0f, 1.0f),
+		VertexPositionNormalTexture(1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, -1.0f, -1.0f),
+		VertexPositionNormalTexture(1.0f,  1.0f, -1.0f, 0.0f, 0.0f, 1.0f,  1.0f, -1.0f),
+		VertexPositionNormalTexture(1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 1.0f,  1.0f,  1.0f),
+		VertexPositionNormalTexture(1.0f, -1.0f,  1.0f, 1.0f, 1.0f,1.0f, -1.0f,  1.0f),
 	};
 
 	DWORD indices[] = {
@@ -95,7 +95,7 @@ bool Game::initialize(UINT width, UINT height)
 	ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
 
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(VertexPositionTexture) * 24;
+	vertexBufferDesc.ByteWidth = sizeof(VertexPositionNormalTexture) * 24;
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = 0;
 	vertexBufferDesc.MiscFlags = 0;
@@ -120,7 +120,7 @@ bool Game::initialize(UINT width, UINT height)
 	hr = AMD3D->d3d11Device->CreateBuffer(&indexBufferDesc, &iinitData, &cubeIndexBuffer);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Index Buffer Creation - Failed", "Error");
 
-	hr = AMD3D->d3d11Device->CreateInputLayout(VertexPositionTexture::layout, VertexPositionTexture::numElements, VS_Buffer->GetBufferPointer(),
+	hr = AMD3D->d3d11Device->CreateInputLayout(VertexPositionNormalTexture::layout, VertexPositionNormalTexture::numElements, VS_Buffer->GetBufferPointer(),
 		VS_Buffer->GetBufferSize(), &vertLayout);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Input Layout Creation - Failed", "Error");
 
@@ -151,6 +151,8 @@ bool Game::initialize(UINT width, UINT height)
 	hr = CreateWICTextureFromFile(AMD3D->d3d11Device, L"braynzar.jpg", nullptr, &CubesTexture);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Loading Texture - Failed", "Error");
 
+	camPosition = XMVectorSet(0.0f, 3.0f, -8.0f, 0.0f);
+
 	return true;
 }
 
@@ -158,9 +160,12 @@ float yRotate = -XM_2PI;
 //float zCamOffset = 8.0f;
 //int zCamOffsetSign = 1;
 
+float camPosY = 0;
+float camRotY = 0;
 void Game::update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[])
 {
-	camPosition = XMVectorSet(0.0f, 3.0f, -8.0f, 0.0f);
+	camPosition = XMVectorSetY(camPosition, 3.0f + camPosY);
+
 	camTarget = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	camUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
@@ -168,10 +173,23 @@ void Game::update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyb
 	World = XMMatrixRotationY(yRotate);
 
 
-	if(mouseCurrState.rgbButtons[0] & 0x80)
-		yRotate += (XM_2PI) * time;
-	if (mouseCurrState.rgbButtons[1] & 0x80)
-		yRotate -= (XM_2PI) * time;
+	if (INPUT_DOWN(mouseCurrState.rgbButtons[0]))
+		yRotate += (XM_2PI)* time;
+	if (INPUT_DOWN(mouseCurrState.rgbButtons[1]))
+		yRotate -= (XM_2PI)* time;
+	if (INPUT_DOWN(currKeyboardState[DIK_G]))
+		camPosY += time;
+	if (INPUT_DOWN(currKeyboardState[DIK_B]))
+		camPosY -= time;
+	if (INPUT_DOWN(currKeyboardState[DIK_F]))
+		camRotY -= time;
+	if (INPUT_DOWN(currKeyboardState[DIK_H]))
+		camRotY += time;
+
+	XMMATRIX camRot = XMMatrixRotationY(camRotY);
+	camPosition = XMVector3Transform(camPosition, camRot);
+
+	camRotY = 0;
 	//zCamOffset += (zCamOffsetSign * 0.001f);
 	//if (zCamOffset > 5 || zCamOffset < 0.5f)
 	//	zCamOffsetSign *= -1;
@@ -189,15 +207,18 @@ void Game::draw(const int& fps)
 	WVP = World * camView * camProjection
 #endif
 	cbPerObj.WVP = XMMatrixTranspose(WVP);
+	cbPerObj.World = XMMatrixTranspose(World);
+	cbPerObj.lightDirection = XMFLOAT3(0.3f, 0.5f, 0.2f);
 	AMD3D->d3d11DevCon->UpdateSubresource(cbPerObjectBuffer, 0, NULL, &cbPerObj, 0, 0);
 	AMD3D->d3d11DevCon->VSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
+	AMD3D->d3d11DevCon->PSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
 	AMD3D->d3d11DevCon->PSSetShaderResources(0, 1, &CubesTexture);
 	//AMD3D->d3d11DevCon->PSSetSamplers(0, 1, &CubesTexSamplerState);
 
 	AMD3D->d3d11DevCon->VSSetShader(VS, NULL, NULL);
 	AMD3D->d3d11DevCon->PSSetShader(PS, NULL, NULL);
 
-	UINT stride = sizeof(VertexPositionTexture);
+	UINT stride = sizeof(VertexPositionNormalTexture);
 	UINT offset = 0;
 	AMD3D->d3d11DevCon->IASetVertexBuffers(0, 1, &cubeVertBuffer, &stride, &offset);
 	AMD3D->d3d11DevCon->IASetIndexBuffer(cubeIndexBuffer, DXGI_FORMAT_R32_UINT, 0);

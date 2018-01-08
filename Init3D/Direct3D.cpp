@@ -113,14 +113,14 @@ bool Direct3D::initialize(HWND hwnd, HINSTANCE hInstance, const int width, const
 
 	Direct3D::getInstance()->d3d11DevCon->RSSetViewports(1, &viewport);
 
-	/*D3D11_RASTERIZER_DESC wfdesc;
+	D3D11_RASTERIZER_DESC wfdesc;
 	ZeroMemory(&wfdesc, sizeof(D3D11_RASTERIZER_DESC));
 	wfdesc.FillMode = D3D11_FILL_SOLID;
-	wfdesc.CullMode = D3D11_CULL_BACK;
+	wfdesc.CullMode = D3D11_CULL_NONE;
 	wfdesc.MultisampleEnable = TRUE;
 	wfdesc.AntialiasedLineEnable = TRUE;
 	hr = d3d11Device->CreateRasterizerState(&wfdesc, &WireFrame);
-	d3d11DevCon->RSSetState(WireFrame);*/ 
+	d3d11DevCon->RSSetState(WireFrame);
 
 	return true;
 }
@@ -132,7 +132,7 @@ void Direct3D::shutdown()
 	this->d3d11DevCon->Release();
 	this->depthStencilView->Release();
 	this->depthStencilBuffer->Release();
-	//this->WireFrame->Release();
+	this->WireFrame->Release();
 	delete this;
 }
 

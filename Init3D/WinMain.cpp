@@ -121,6 +121,7 @@ int messageloop()
 		else
 		{
 			BYTE currKeyboardState[256];
+			ZeroMemory(currKeyboardState, sizeof(currKeyboardState));
 			Input::getInstance()->detectInput(mouseCurrState, currKeyboardState);
 
 			frameCount++;

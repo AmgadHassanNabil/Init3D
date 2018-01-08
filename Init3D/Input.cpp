@@ -86,7 +86,7 @@ void Input::detectInput(DIMOUSESTATE& mouseCurrState, BYTE keyboardState[])
 
 	DIMouse->GetDeviceState(sizeof(DIMOUSESTATE), &mouseCurrState);
 
-	DIKeyboard->GetDeviceState(sizeof(keyboardState), (LPVOID)&keyboardState);
+	DIKeyboard->GetDeviceState(sizeof(BYTE) * 256, (LPVOID)keyboardState);
 }
 
 void Input::release()

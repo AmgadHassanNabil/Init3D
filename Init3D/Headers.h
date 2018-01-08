@@ -12,6 +12,7 @@
 #include "Vertices.h"
 #include "WICTextureLoader.h"
 #include "Input.h"
+#include "FBXImporter.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
@@ -23,5 +24,6 @@
 																	return false;										\
 																}
 
-#define	AMD3D	Direct3D::getInstance()
-#define AMINPUT	Input::getInstance()
+#define	AMD3D			Direct3D::getInstance()
+#define AMINPUT			Input::getInstance()
+#define INPUT_DOWN(a)	a & 0x80
