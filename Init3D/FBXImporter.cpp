@@ -54,7 +54,7 @@ HRESULT FBXImporter::parseFBX(const char * fileName, XMFLOAT3** verticiesPositio
 
 			FbxMesh* pMesh = pFbxChildNode->GetMesh();
 
-			numberOfVerticies = pMesh->GetControlPointsCount();//number of vertices
+			numberOfVerticies = pMesh->GetControlPointsCount();
 			*verticiesPositions = new XMFLOAT3[numberOfVerticies];
 
 			for (DWORD j = 0; j < numberOfVerticies; j++)

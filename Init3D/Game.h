@@ -32,12 +32,14 @@ private:
 	XMVECTOR camTarget;
 	XMVECTOR camUp;
 
+	DWORD numberOfVerticies, numberOfIndicies;
+
 	struct cbPerObject
 	{
 		XMMATRIX  WVP;
-		XMMATRIX World;
-		XMFLOAT3 lightDirection;
-		float padding;
+		//XMMATRIX World;
+		//XMFLOAT3 lightDirection;
+		//float padding;
 	};
 
 	cbPerObject cbPerObj;
@@ -50,6 +52,8 @@ private:
 	
 
 	static Game* instance;
+
+	bool loadModel();
 
 public:
 	bool initialize(UINT, UINT);
