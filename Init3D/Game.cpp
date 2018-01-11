@@ -13,19 +13,24 @@ bool Game::loadModel()
 {
 	XMFLOAT3* positions = NULL;
 	DWORD* indiciesF = NULL;
+	XMFLOAT3* normals = NULL;
+	DWORD numberOfNormals;
 	
-	FBXImporter::getInstance()->parseFBX("C:\\Program Files\\Autodesk\\FBX\\FBX SDK\\2018.0\\samples\\ViewScene\\humanoid.fbx", &positions, numberOfVerticies, &indiciesF, numberOfIndicies);
+	FBXImporter::getInstance()->parseFBX("C:\\Program Files\\Autodesk\\FBX\\FBX SDK\\2018.0\\samples\\ViewScene\\humanoid.fbx",
+		&positions, numberOfVerticies,
+		&indiciesF, numberOfIndicies,
+		&normals);
 
-	VertexPositionColor* modelVerticies = new VertexPositionColor[numberOfVerticies];
+	VertexPositionNormalTexture* modelVerticies = new VertexPositionNormalTexture[numberOfVerticies];
 
 	for (DWORD i = 0; i < numberOfVerticies; i++)
-		modelVerticies[i] = VertexPositionColor(positions[i], XMFLOAT4(1, 0, 0, 1));
+		modelVerticies[i] = VertexPositionNormalTexture(positions[i], XMFLOAT2(0, 0), normals[i]);
 
 	D3D11_BUFFER_DESC vertexBufferDesc;
 	ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
 
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(VertexPositionColor) * numberOfVerticies;
+	vertexBufferDesc.ByteWidth = sizeof(VertexPositionNormalTexture) * numberOfVerticies;
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = 0;
 	vertexBufferDesc.MiscFlags = 0;
@@ -50,11 +55,13 @@ bool Game::loadModel()
 	hr = AMD3D->d3d11Device->CreateBuffer(&indexBufferDesc, &iinitData, &cubeIndexBuffer);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Index Buffer Creation - Failed", "Error");
 
-	hr = AMD3D->d3d11Device->CreateInputLayout(VertexPositionColor::layout, VertexPositionColor::numElements, VS_Buffer->GetBufferPointer(),
+	hr = AMD3D->d3d11Device->CreateInputLayout(VertexPositionNormalTexture::layout, VertexPositionNormalTexture::numElements, VS_Buffer->GetBufferPointer(),
 		VS_Buffer->GetBufferSize(), &vertLayout);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Input Layout Creation - Failed", "Error");
 
-	delete[] modelVerticies, positions, indiciesF;
+	delete[] modelVerticies;
+	delete[] positions;
+	delete[] normals;
 }
 
 bool Game::initialize(UINT width, UINT height)
@@ -129,9 +136,9 @@ bool Game::initialize(UINT width, UINT height)
 
 	HRESULT hr;
 	
-	hr = CompileShader(L"Effects.fx", "VS", "vs_5_0", &VS_Buffer);
+	hr = CompileShader(L"TexturedEffect.fx", "VS", "vs_5_0", &VS_Buffer);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "VertexShader Loading - Failed", "Error");
-	hr = CompileShader(L"Effects.fx", "PS", "ps_5_0", &PS_Buffer);
+	hr = CompileShader(L"TexturedEffect.fx", "PS", "ps_5_0", &PS_Buffer);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "PixelShader Loading - Failed", "Error");
 
 	hr = AMD3D->d3d11Device->CreateVertexShader(VS_Buffer->GetBufferPointer(), VS_Buffer->GetBufferSize(), NULL, &VS);
@@ -261,8 +268,8 @@ void Game::draw(const int& fps)
 	WVP = World * camView * camProjection
 #endif
 	cbPerObj.WVP = XMMatrixTranspose(WVP);
-	//cbPerObj.World = XMMatrixTranspose(World);
-	//cbPerObj.lightDirection = XMFLOAT3(0.3f, 0.5f, 0.2f);
+	cbPerObj.World = XMMatrixTranspose(World);
+	cbPerObj.lightDirection = XMFLOAT3(0.3f, 0.5f, 0.2f);
 	AMD3D->d3d11DevCon->UpdateSubresource(cbPerObjectBuffer, 0, NULL, &cbPerObj, 0, 0);
 	AMD3D->d3d11DevCon->VSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
 	AMD3D->d3d11DevCon->PSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
@@ -272,7 +279,7 @@ void Game::draw(const int& fps)
 	AMD3D->d3d11DevCon->VSSetShader(VS, NULL, NULL);
 	AMD3D->d3d11DevCon->PSSetShader(PS, NULL, NULL);
 
-	UINT stride = sizeof(VertexPositionColor);
+	UINT stride = sizeof(VertexPositionNormalTexture);
 	UINT offset = 0;
 	AMD3D->d3d11DevCon->IASetVertexBuffers(0, 1, &cubeVertBuffer, &stride, &offset);
 	AMD3D->d3d11DevCon->IASetIndexBuffer(cubeIndexBuffer, DXGI_FORMAT_R32_UINT, 0);

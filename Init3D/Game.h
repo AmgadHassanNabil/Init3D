@@ -37,9 +37,9 @@ private:
 	struct cbPerObject
 	{
 		XMMATRIX  WVP;
-		//XMMATRIX World;
-		//XMFLOAT3 lightDirection;
-		//float padding;
+		XMMATRIX World;
+		XMFLOAT3 lightDirection;
+		float padding;
 	};
 
 	cbPerObject cbPerObj;

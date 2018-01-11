@@ -44,6 +44,13 @@ struct VertexPositionNormalTexture
 	XMFLOAT2 texCoords;
 	XMFLOAT3 normal;
 
+	VertexPositionNormalTexture()
+	{	}
+	VertexPositionNormalTexture(XMFLOAT3 pos,
+						XMFLOAT2 texCoords,
+						XMFLOAT3 normal)
+		:pos(pos), texCoords(texCoords), normal(normal)
+	{	}
 	VertexPositionNormalTexture(float x, float y, float z, float u, float v, float nx, float ny, float nz)
 		: pos(x, y, z), texCoords(u, v), normal(nx, ny, nz)
 	{	}
