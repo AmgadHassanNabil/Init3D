@@ -25,78 +25,136 @@ inline HRESULT FBXImporter::loadIndicies(FbxMesh* pMesh, DWORD** indicies, DWORD
 
 inline HRESULT FBXImporter::loadNormals(FbxMesh* pMesh, XMFLOAT3** normals)
 {
+	//pMesh->GenerateNormals(true, true);
 	FbxGeometryElementNormal* lNormalElement = pMesh->GetElementNormal();
 	if (lNormalElement)
 	{
-		//mapping mode is by control points. The mesh should be smooth and soft.
-		//we can get normals by retrieving each control point
 		if (lNormalElement->GetMappingMode() == FbxGeometryElement::eByControlPoint)
 		{
 			int numberOfNormals = pMesh->GetControlPointsCount();
 			*normals = new XMFLOAT3[numberOfNormals];
-			//Let's get normals of each vertex, since the mapping mode of normal element is by control point
+
 			for (int lVertexIndex = 0; lVertexIndex < numberOfNormals; lVertexIndex++)
 			{
 				int lNormalIndex = 0;
-				//reference mode is direct, the normal index is same as vertex index.
-				//get normals by the index of control vertex
 				if (lNormalElement->GetReferenceMode() == FbxGeometryElement::eDirect)
 					lNormalIndex = lVertexIndex;
 
-				//reference mode is index-to-direct, get normals by the index-to-direct
 				if (lNormalElement->GetReferenceMode() == FbxGeometryElement::eIndexToDirect)
 					lNormalIndex = lNormalElement->GetIndexArray().GetAt(lVertexIndex);
 
-				//Got normals of each vertex.
 				FbxVector4 lNormal = lNormalElement->GetDirectArray().GetAt(lNormalIndex);
 				(*normals)[lNormalIndex] = XMFLOAT3(lNormal[0], lNormal[1], lNormal[2]);
-
-				//add your custom code here, to output normals or get them into a list, such as KArrayTemplate<FbxVector4>
-				//. . .
-			}//end for lVertexIndex
-		}//end eByControlPoint
-		 //mapping mode is by polygon-vertex.
-		 //we can get normals by retrieving polygon-vertex.
+			}
+		}
 		else if (lNormalElement->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
 		{
 			int lIndexByPolygonVertex = 0;
-			//Let's get normals of each polygon, since the mapping mode of normal element is by polygon-vertex.
+			
 			for (int lPolygonIndex = 0; lPolygonIndex < pMesh->GetPolygonCount(); lPolygonIndex++)
 			{
-				//get polygon size, you know how many vertices in current polygon.
 				int lPolygonSize = pMesh->GetPolygonSize(lPolygonIndex);
-				//retrieve each vertex of current polygon.
+			
 				for (int i = 0; i < lPolygonSize; i++)
 				{
 					int lNormalIndex = 0;
-					//reference mode is direct, the normal index is same as lIndexByPolygonVertex.
+					
 					if (lNormalElement->GetReferenceMode() == FbxGeometryElement::eDirect)
 						lNormalIndex = lIndexByPolygonVertex;
 
-					//reference mode is index-to-direct, get normals by the index-to-direct
 					if (lNormalElement->GetReferenceMode() == FbxGeometryElement::eIndexToDirect)
 						lNormalIndex = lNormalElement->GetIndexArray().GetAt(lIndexByPolygonVertex);
 
-					//Got normals of each polygon-vertex.
 					FbxVector4 lNormal = lNormalElement->GetDirectArray().GetAt(lNormalIndex);
 
 					//(*normals)[lNormalIndex] = XMFLOAT3(lNormal[0], lNormal[1], lNormal[2], lNormal[3]);
-					//add your custom code here, to output normals or get them into a list, such as KArrayTemplate<FbxVector4>
-					//. . .
 
 					lIndexByPolygonVertex++;
-				}//end for i //lPolygonSize
-			}//end for lPolygonIndex //PolygonCount
+				}
+			}
+				int x = 0;
+				x++;
+		}
+	}
 
-		}//end eByPolygonVertex
-	}//end if lNormalElement
-
-	return E_NOTIMPL;
+	return S_OK;
 }
 
-inline HRESULT FBXImporter::loadUVs(FbxMesh* pMesh)
+inline HRESULT FBXImporter::loadUVs(FbxMesh* pMesh, XMFLOAT2** uvs)
 {
+	FbxStringList lUVSetNameList;
+	pMesh->GetUVSetNames(lUVSetNameList);
 
+	//iterating over all uv sets
+	for (int lUVSetIndex = 0; lUVSetIndex < lUVSetNameList.GetCount(); lUVSetIndex++)
+	{
+		//get lUVSetIndex-th uv set
+		const char* lUVSetName = lUVSetNameList.GetStringAt(lUVSetIndex);
+		const FbxGeometryElementUV* lUVElement = pMesh->GetElementUV(lUVSetName);
+
+		if (!lUVElement)
+			continue;
+
+		// only support mapping mode eByPolygonVertex and eByControlPoint
+		if (lUVElement->GetMappingMode() != FbxGeometryElement::eByPolygonVertex &&
+			lUVElement->GetMappingMode() != FbxGeometryElement::eByControlPoint)
+			return E_NOTIMPL;
+
+		//index array, where holds the index referenced to the uv data
+		const bool lUseIndex = lUVElement->GetReferenceMode() != FbxGeometryElement::eDirect;
+		const int lIndexCount = (lUseIndex) ? lUVElement->GetIndexArray().GetCount() : 0;
+
+		//iterating through the data by polygon
+		const int lPolyCount = pMesh->GetPolygonCount();
+		*uvs = new XMFLOAT2[lPolyCount * 3];
+
+		if (lUVElement->GetMappingMode() == FbxGeometryElement::eByControlPoint)
+		{
+			for (int lPolyIndex = 0; lPolyIndex < lPolyCount; ++lPolyIndex)
+			{
+				// build the max index array that we need to pass into MakePoly
+				const int lPolySize = pMesh->GetPolygonSize(lPolyIndex);
+				for (int lVertIndex = 0; lVertIndex < lPolySize; ++lVertIndex)
+				{
+					//get the index of the current vertex in control points array
+					int lPolyVertIndex = pMesh->GetPolygonVertex(lPolyIndex, lVertIndex);
+
+					//the UV index depends on the reference mode
+					int lUVIndex = lUseIndex ? lUVElement->GetIndexArray().GetAt(lPolyVertIndex) : lPolyVertIndex;
+
+					FbxVector2 lUVValue = lUVElement->GetDirectArray().GetAt(lUVIndex);
+					(*uvs)[lUVIndex] = XMFLOAT2(lUVValue.mData[0], lUVValue.mData[1]);
+				}
+			}
+		}
+		else if (lUVElement->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+		{
+			int lPolyIndexCounter = 0;
+			for (int lPolyIndex = 0; lPolyIndex < lPolyCount; ++lPolyIndex)
+			{
+				// build the max index array that we need to pass into MakePoly
+				const int lPolySize = pMesh->GetPolygonSize(lPolyIndex);
+				for (int lVertIndex = 0; lVertIndex < lPolySize; ++lVertIndex)
+				{
+					if (lPolyIndexCounter < lIndexCount)
+					{
+						FbxVector2 lUVValue;
+
+						//the UV index depends on the reference mode
+						int lUVIndex = lUseIndex ? lUVElement->GetIndexArray().GetAt(lPolyIndexCounter) : lPolyIndexCounter;
+
+						lUVValue = lUVElement->GetDirectArray().GetAt(lUVIndex);
+
+						//User TODO:
+						//Print out the value of UV(lUVValue) or log it to a file
+
+						lPolyIndexCounter++;
+					}
+				}
+			}
+		}
+	}
+	
 	return E_NOTIMPL;
 }
 
@@ -129,7 +187,7 @@ FBXImporter * FBXImporter::getInstance()
 HRESULT FBXImporter::parseFBX(const char * fileName,
 	XMFLOAT3** verticiesPositions, DWORD &numberOfVerticies, 
 	DWORD** indicies, DWORD &numberOfIndicies,
-	XMFLOAT3** normals)
+	XMFLOAT3** normals, XMFLOAT2** uvs)
 {
 	FbxImporter* pImporter = FbxImporter::Create(g_pFbxSdkManager, "");
 	FbxScene* pFbxScene = FbxScene::Create(g_pFbxSdkManager, "");
@@ -158,12 +216,13 @@ HRESULT FBXImporter::parseFBX(const char * fileName,
 				continue;
 
 			FbxMesh* pMesh = pFbxChildNode->GetMesh();
+			bSuccess = pMesh->SplitPoints();
+			if (!bSuccess) return E_FAIL;
 
-			
 			loadVerteciesPositions(pMesh, verticiesPositions, numberOfVerticies);
 			loadIndicies(pMesh, indicies, numberOfIndicies);
 			loadNormals(pMesh, normals);
-
+			loadUVs(pMesh, uvs);
 		}
 
 	}

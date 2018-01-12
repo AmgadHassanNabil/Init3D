@@ -15,16 +15,17 @@ bool Game::loadModel()
 	DWORD* indiciesF = NULL;
 	XMFLOAT3* normals = NULL;
 	DWORD numberOfNormals;
-	
-	FBXImporter::getInstance()->parseFBX("C:\\Program Files\\Autodesk\\FBX\\FBX SDK\\2018.0\\samples\\ViewScene\\humanoid.fbx",
+	XMFLOAT2* uvs = NULL;
+
+	FBXImporter::getInstance()->parseFBX("D:\\Graphics\\SpaceShip.fbx",
 		&positions, numberOfVerticies,
 		&indiciesF, numberOfIndicies,
-		&normals);
+		&normals, &uvs);
 
 	VertexPositionNormalTexture* modelVerticies = new VertexPositionNormalTexture[numberOfVerticies];
 
 	for (DWORD i = 0; i < numberOfVerticies; i++)
-		modelVerticies[i] = VertexPositionNormalTexture(positions[i], XMFLOAT2(0, 0), normals[i]);
+		modelVerticies[i] = VertexPositionNormalTexture(positions[i], uvs[i], normals[i]);
 
 	D3D11_BUFFER_DESC vertexBufferDesc;
 	ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
@@ -62,6 +63,7 @@ bool Game::loadModel()
 	delete[] modelVerticies;
 	delete[] positions;
 	delete[] normals;
+	delete[] uvs;
 }
 
 bool Game::initialize(UINT width, UINT height)
@@ -193,20 +195,21 @@ bool Game::initialize(UINT width, UINT height)
 
 	camProjection = XMMatrixPerspectiveFovLH(0.4f*3.14f, (float)width / height, 1.0f, 1000.0f);
 	
-	//D3D11_SAMPLER_DESC sampDesc;
-	//ZeroMemory(&sampDesc, sizeof(sampDesc));
-	//sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	//sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	//sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	//sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	//sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-	//sampDesc.MinLOD = 0;
-	//sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-	//hr = AMD3D->d3d11Device->CreateSamplerState(&sampDesc, &CubesTexSamplerState);
-	//SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Sampler State Creation - Failed", "Error");
+	D3D11_SAMPLER_DESC sampDesc;
+	ZeroMemory(&sampDesc, sizeof(sampDesc));
+	sampDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
+	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
+	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
+	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	sampDesc.MaxAnisotropy = 4;
+	sampDesc.MinLOD = 0;
+	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	hr = AMD3D->d3d11Device->CreateSamplerState(&sampDesc, &CubesTexSamplerState);
+	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Sampler State Creation - Failed", "Error");
 
 	//DirectX::Model
-	hr = CreateWICTextureFromFile(AMD3D->d3d11Device, L"braynzar.jpg", nullptr, &CubesTexture);
+	hr = CreateWICTextureFromFile(AMD3D->d3d11Device, L"metal.jpg", nullptr, &CubesTexture);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Loading Texture - Failed", "Error");
 
 	camPosition = XMVectorSet(0.0f, 3.0f, -8.0f, 0.0f);
@@ -228,7 +231,7 @@ void Game::update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyb
 	camUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
 	camView = XMMatrixLookAtLH(camPosition, camTarget, camUp);
-	World = /*XMMatrixScaling(0.1f, 0.1f, 0.1f) */ XMMatrixRotationY(yRotate);
+	World = XMMatrixScaling(0.1f, 0.1f, 0.1f) * XMMatrixRotationY(yRotate);
 
 
 	if (INPUT_DOWN(mouseCurrState.rgbButtons[0]))
@@ -274,7 +277,7 @@ void Game::draw(const int& fps)
 	AMD3D->d3d11DevCon->VSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
 	AMD3D->d3d11DevCon->PSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
 	AMD3D->d3d11DevCon->PSSetShaderResources(0, 1, &CubesTexture);
-	//AMD3D->d3d11DevCon->PSSetSamplers(0, 1, &CubesTexSamplerState);
+	AMD3D->d3d11DevCon->PSSetSamplers(0, 1, &CubesTexSamplerState);
 
 	AMD3D->d3d11DevCon->VSSetShader(VS, NULL, NULL);
 	AMD3D->d3d11DevCon->PSSetShader(PS, NULL, NULL);
@@ -303,7 +306,7 @@ void Game::release()
 	VS->Release();
 	PS->Release();
 	cbPerObjectBuffer->Release();
-	//CubesTexSamplerState->Release();
+	CubesTexSamplerState->Release();
 	CubesTexture->Release();
 	delete this;
 }

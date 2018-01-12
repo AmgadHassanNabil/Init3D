@@ -7,13 +7,7 @@ cbuffer cbPerObject
 };
 
 Texture2D ObjTexture;
-SamplerState ObjSamplerState 
-{
-	Filter = ANISOTROPIC;
-	MaxAnisotropy = 4;
-	AddressU = WRAP;
-	AddressV = WRAP;
-};
+SamplerState ObjSamplerState;
 
 struct VS_OUTPUT
 {
@@ -37,7 +31,7 @@ float4 PS(VS_OUTPUT input) : SV_TARGET
 {
 	input.Normal = normalize(input.Normal);
 
-	float diffuse = dot(input.Normal, lightDirection) * 5;
+	float diffuse = dot(input.Normal, lightDirection) * 2;
 	float4 color = saturate(ObjTexture.Sample(ObjSamplerState, input.TexCoord) * diffuse);
 	color.a = 1;
 	return color;
