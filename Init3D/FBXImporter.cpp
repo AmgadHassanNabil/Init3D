@@ -188,7 +188,7 @@ inline HRESULT FBXImporter::loadTextures(FbxScene* pScene, DWORD& textureCount, 
 		outModelTextures[i] = currTex;
 	}
 	
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 FBXImporter::FBXImporter()

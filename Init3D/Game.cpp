@@ -222,8 +222,6 @@ float camPosZ = 0;
 float camRotY = 0;
 void Game::update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[])
 {
-	
-
 	camTarget = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	camUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
