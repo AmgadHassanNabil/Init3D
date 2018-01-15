@@ -17,10 +17,11 @@ bool Game::loadModel()
 	DWORD numberOfNormals;
 	XMFLOAT2* uvs = NULL;
 
-	FBXImporter::getInstance()->parseFBX("D:\\Graphics\\SpaceShip.fbx",
+	HRESULT hr = FBXImporter::getInstance()->parseFBX("D:\\Graphics\\SpaceShip.fbx",
 		&positions, numberOfVerticies,
 		&indiciesF, numberOfIndicies,
 		&normals, &uvs, textures, numberOfTextures);
+	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Loading Model - Failed", "Error");
 
 	VertexPositionNormalTexture* modelVerticies = new VertexPositionNormalTexture[numberOfVerticies];
 
@@ -40,7 +41,7 @@ bool Game::loadModel()
 
 	ZeroMemory(&vertexBufferData, sizeof(vertexBufferData));
 	vertexBufferData.pSysMem = modelVerticies;
-	HRESULT hr = AMD3D->d3d11Device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &cubeVertBuffer);
+	hr = AMD3D->d3d11Device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &cubeVertBuffer);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Vertex Buffer Creation - Failed", "Error");
 
 	D3D11_BUFFER_DESC indexBufferDesc;
@@ -207,9 +208,6 @@ bool Game::initialize(UINT width, UINT height)
 	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	hr = AMD3D->d3d11Device->CreateSamplerState(&sampDesc, &CubesTexSamplerState);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Sampler State Creation - Failed", "Error");
-
-	//hr = CreateWICTextureFromFile(AMD3D->d3d11Device, L"metal.jpg", nullptr, &CubesTexture);
-	//SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Loading Texture - Failed", "Error");
 
 	camPosition = XMVectorSet(0.0f, 3.0f, -8.0f, 0.0f);
 

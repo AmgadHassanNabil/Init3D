@@ -1,5 +1,8 @@
 #include "FBXImporter.h"
 
+#define ON_FAIL_RETURN_HRESULT(a)	if(FAILED(a)) return a
+
+
 FBXImporter* FBXImporter::instance;
 
 inline HRESULT FBXImporter::loadVerteciesPositions(FbxMesh* pMesh, XMFLOAT3** verticiesPositions, DWORD &numberOfVerticies)
@@ -155,7 +158,7 @@ inline HRESULT FBXImporter::loadUVs(FbxMesh* pMesh, XMFLOAT2** uvs)
 		}
 	}
 	
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 inline HRESULT FBXImporter::loadTextures(FbxScene* pScene, DWORD& textureCount, ID3D11ShaderResourceView** &outModelTextures)
@@ -168,13 +171,21 @@ inline HRESULT FBXImporter::loadTextures(FbxScene* pScene, DWORD& textureCount, 
 		FbxTexture* texture = pScene->GetTexture(i);
 		const FbxFileTexture *lFileTexture = (const FbxFileTexture*)(texture);
 		const char* str = (const char*)lFileTexture->GetFileName();
-		size_t fileNameLength = strlen(str);
+		int fileNameLength = strlen(str);
 		wchar_t wStr[100];
 		MultiByteToWideChar(CP_ACP, 0, str, -1, &wStr[0], fileNameLength + 1);
 		ID3D11ShaderResourceView* currTex = NULL;
 		hr = CreateWICTextureFromFile(AMD3D->d3d11Device, &wStr[0], nullptr, &currTex);
+
+		//failed to Load file release previous files that are loaded
+		if (FAILED(hr))
+		{
+			for (int j = 0; j < i; j++)
+				outModelTextures[i]->Release();
+			delete[] outModelTextures;
+			break;
+		}
 		outModelTextures[i] = currTex;
-		int x = 0;
 	}
 	
 	return E_NOTIMPL;
@@ -213,7 +224,7 @@ HRESULT FBXImporter::parseFBX(const char * fileName,
 	if (!bSuccess) return E_FAIL;
 
 	bSuccess = pImporter->Import(pFbxScene);
-	if (!bSuccess) return E_FAIL;
+	if (!bSuccess) return ERROR_FILE_NOT_FOUND;
 
 	pImporter->Destroy();
 
@@ -237,11 +248,11 @@ HRESULT FBXImporter::parseFBX(const char * fileName,
 			bSuccess = pMesh->SplitPoints();
 			if (!bSuccess) return E_FAIL;
 
-			loadVerteciesPositions(pMesh, verticiesPositions, numberOfVerticies);
-			loadIndicies(pMesh, indicies, numberOfIndicies);
-			loadNormals(pMesh, normals);
-			loadUVs(pMesh, uvs);
-			loadTextures(pFbxScene, textureCount, outModelTextures);
+			ON_FAIL_RETURN_HRESULT(loadVerteciesPositions(pMesh, verticiesPositions, numberOfVerticies));
+			ON_FAIL_RETURN_HRESULT(loadIndicies(pMesh, indicies, numberOfIndicies));
+			ON_FAIL_RETURN_HRESULT(loadNormals(pMesh, normals));
+			ON_FAIL_RETURN_HRESULT(loadUVs(pMesh, uvs));
+			ON_FAIL_RETURN_HRESULT(loadTextures(pFbxScene, textureCount, outModelTextures));
 		}
 
 	}
