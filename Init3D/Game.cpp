@@ -20,7 +20,7 @@ bool Game::loadModel()
 	FBXImporter::getInstance()->parseFBX("D:\\Graphics\\SpaceShip.fbx",
 		&positions, numberOfVerticies,
 		&indiciesF, numberOfIndicies,
-		&normals, &uvs);
+		&normals, &uvs, textures, numberOfTextures);
 
 	VertexPositionNormalTexture* modelVerticies = new VertexPositionNormalTexture[numberOfVerticies];
 
@@ -208,9 +208,8 @@ bool Game::initialize(UINT width, UINT height)
 	hr = AMD3D->d3d11Device->CreateSamplerState(&sampDesc, &CubesTexSamplerState);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Sampler State Creation - Failed", "Error");
 
-	//DirectX::Model
-	hr = CreateWICTextureFromFile(AMD3D->d3d11Device, L"metal.jpg", nullptr, &CubesTexture);
-	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Loading Texture - Failed", "Error");
+	//hr = CreateWICTextureFromFile(AMD3D->d3d11Device, L"metal.jpg", nullptr, &CubesTexture);
+	//SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Loading Texture - Failed", "Error");
 
 	camPosition = XMVectorSet(0.0f, 3.0f, -8.0f, 0.0f);
 
@@ -276,7 +275,7 @@ void Game::draw(const int& fps)
 	AMD3D->d3d11DevCon->UpdateSubresource(cbPerObjectBuffer, 0, NULL, &cbPerObj, 0, 0);
 	AMD3D->d3d11DevCon->VSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
 	AMD3D->d3d11DevCon->PSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
-	AMD3D->d3d11DevCon->PSSetShaderResources(0, 1, &CubesTexture);
+	AMD3D->d3d11DevCon->PSSetShaderResources(0, 1, &textures[0]);
 	AMD3D->d3d11DevCon->PSSetSamplers(0, 1, &CubesTexSamplerState);
 
 	AMD3D->d3d11DevCon->VSSetShader(VS, NULL, NULL);
@@ -307,7 +306,9 @@ void Game::release()
 	PS->Release();
 	cbPerObjectBuffer->Release();
 	CubesTexSamplerState->Release();
-	CubesTexture->Release();
+	for (int i = 0; i < numberOfTextures; i++)
+		textures[i]->Release();
+	delete[] textures;
 	delete this;
 }
 

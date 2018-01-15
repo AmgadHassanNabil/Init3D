@@ -20,7 +20,7 @@ private:
 	ID3DBlob* errorBlob = NULL;
 	ID3D11Buffer* cbPerObjectBuffer;
 
-	ID3D11ShaderResourceView* CubesTexture;
+	ID3D11ShaderResourceView** textures;
 	ID3D11SamplerState* CubesTexSamplerState;
 
 	XMMATRIX WVP;
@@ -32,7 +32,7 @@ private:
 	XMVECTOR camTarget;
 	XMVECTOR camUp;
 
-	DWORD numberOfVerticies, numberOfIndicies;
+	DWORD numberOfVerticies, numberOfIndicies, numberOfTextures;
 
 	struct cbPerObject
 	{

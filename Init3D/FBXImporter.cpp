@@ -158,8 +158,25 @@ inline HRESULT FBXImporter::loadUVs(FbxMesh* pMesh, XMFLOAT2** uvs)
 	return E_NOTIMPL;
 }
 
-inline HRESULT FBXImporter::loadTextures(FbxMesh* pMesh)
+inline HRESULT FBXImporter::loadTextures(FbxScene* pScene, DWORD& textureCount, ID3D11ShaderResourceView** &outModelTextures)
 {
+	HRESULT hr;
+	textureCount = pScene->GetTextureCount();
+	outModelTextures = new ID3D11ShaderResourceView*[textureCount];
+	for (int i = 0; i < textureCount; i++)
+	{
+		FbxTexture* texture = pScene->GetTexture(i);
+		const FbxFileTexture *lFileTexture = (const FbxFileTexture*)(texture);
+		const char* str = (const char*)lFileTexture->GetFileName();
+		size_t fileNameLength = strlen(str);
+		wchar_t wStr[100];
+		MultiByteToWideChar(CP_ACP, 0, str, -1, &wStr[0], fileNameLength + 1);
+		ID3D11ShaderResourceView* currTex = NULL;
+		hr = CreateWICTextureFromFile(AMD3D->d3d11Device, &wStr[0], nullptr, &currTex);
+		outModelTextures[i] = currTex;
+		int x = 0;
+	}
+	
 	return E_NOTIMPL;
 }
 
@@ -187,7 +204,8 @@ FBXImporter * FBXImporter::getInstance()
 HRESULT FBXImporter::parseFBX(const char * fileName,
 	XMFLOAT3** verticiesPositions, DWORD &numberOfVerticies, 
 	DWORD** indicies, DWORD &numberOfIndicies,
-	XMFLOAT3** normals, XMFLOAT2** uvs)
+	XMFLOAT3** normals, XMFLOAT2** uvs,
+	ID3D11ShaderResourceView** &outModelTextures, DWORD &textureCount)
 {
 	FbxImporter* pImporter = FbxImporter::Create(g_pFbxSdkManager, "");
 	FbxScene* pFbxScene = FbxScene::Create(g_pFbxSdkManager, "");
@@ -200,7 +218,7 @@ HRESULT FBXImporter::parseFBX(const char * fileName,
 	pImporter->Destroy();
 
 	FbxNode* pFbxRootNode = pFbxScene->GetRootNode();
-
+	
 	if (pFbxRootNode)
 	{
 		for (int i = 0; i < pFbxRootNode->GetChildCount(); i++)
@@ -223,6 +241,7 @@ HRESULT FBXImporter::parseFBX(const char * fileName,
 			loadIndicies(pMesh, indicies, numberOfIndicies);
 			loadNormals(pMesh, normals);
 			loadUVs(pMesh, uvs);
+			loadTextures(pFbxScene, textureCount, outModelTextures);
 		}
 
 	}
