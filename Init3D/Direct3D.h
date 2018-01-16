@@ -1,5 +1,8 @@
 #pragma once
-#include "Headers.h"
+#include <windows.h>
+#include <d3d11.h>
+
+#define	AMD3D			Direct3D::getInstance()
 
 class Direct3D
 {
@@ -20,7 +23,12 @@ public:
 	ID3D11Texture2D* depthStencilBuffer;
 	ID3D11RasterizerState* WireFrame;
 
-	static Direct3D* getInstance();
+	inline static Direct3D* getInstance()
+	{
+		if (instance == nullptr)
+			instance = new Direct3D();
+		return instance;
+	}
 	bool initialize(HWND, HINSTANCE, const int, const int);
 	void shutdown();
 };

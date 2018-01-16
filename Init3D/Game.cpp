@@ -17,7 +17,7 @@ bool Game::loadModel()
 	DWORD numberOfNormals;
 	XMFLOAT2* uvs = NULL;
 
-	HRESULT hr = FBXImporter::getInstance()->parseFBX("D:\\Graphics\\SpaceShip.fbx",
+	HRESULT hr = FBXImporter::getInstance()->parseFBX(AMD3D->d3d11Device, "D:\\Graphics\\SpaceShip.fbx",
 		&positions, numberOfVerticies,
 		&indiciesF, numberOfIndicies,
 		&normals, &uvs, textures, numberOfTextures);
@@ -209,49 +209,22 @@ bool Game::initialize(UINT width, UINT height)
 	hr = AMD3D->d3d11Device->CreateSamplerState(&sampDesc, &CubesTexSamplerState);
 	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Sampler State Creation - Failed", "Error");
 
-	camPosition = XMVectorSet(0.0f, 3.0f, -8.0f, 0.0f);
 
 	return true;
 }
 
 float yRotate = -XM_2PI;
-//float zCamOffset = 8.0f;
-//int zCamOffsetSign = 1;
 
-float camPosZ = 0;
-float camRotY = 0;
 void Game::update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[])
 {
-	camTarget = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-	camUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-	camView = XMMatrixLookAtLH(camPosition, camTarget, camUp);
 	World = XMMatrixScaling(0.1f, 0.1f, 0.1f) * XMMatrixRotationY(yRotate);
-
 
 	if (INPUT_DOWN(mouseCurrState.rgbButtons[0]))
 		yRotate += (XM_2PI) * time;
 	if (INPUT_DOWN(mouseCurrState.rgbButtons[1]))
 		yRotate -= (XM_2PI) * time;
-	if (INPUT_DOWN(currKeyboardState[DIK_G]))
-		camPosZ += time * 4.5f;
-	if (INPUT_DOWN(currKeyboardState[DIK_B]))
-		camPosZ -= time * 4.5f;
-	if (INPUT_DOWN(currKeyboardState[DIK_F]))
-		camRotY -= (XM_2PI * time);
-	if (INPUT_DOWN(currKeyboardState[DIK_H]))
-		camRotY += (XM_2PI * time);
 
-	XMMATRIX camRot = XMMatrixRotationY(camRotY);
-	camPosition = XMVector3Transform(camPosition, camRot);
-	XMVECTOR directionToOrigin = XMVector3Normalize(camTarget - camPosition);
-	camPosition = camPosition + (directionToOrigin * camPosZ);//XMVectorSetZ(camPosition, XMVectorGetZ(camPosition) + camPosZ);
-
-	camRotY = 0;
-	camPosZ = 0;
-	//zCamOffset += (zCamOffsetSign * 0.001f);
-	//if (zCamOffset > 5 || zCamOffset < 0.5f)
-	//	zCamOffsetSign *= -1;
+	camera.update(time, mouseCurrState, currKeyboardState);
 }
 
 void Game::draw(const int& fps)
@@ -259,9 +232,10 @@ void Game::draw(const int& fps)
 	AMD3D->d3d11DevCon->ClearRenderTargetView(AMD3D->renderTargetView, bgColor);
 	AMD3D->d3d11DevCon->ClearDepthStencilView(AMD3D->depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-
+	//camera.getView(camView);
+	
 #ifdef _WIN64
-	WVP = XMMatrixMultiply(World, XMMatrixMultiply(camView, camProjection));
+	WVP = XMMatrixMultiply(World, XMMatrixMultiply(camera.camView, camProjection));
 #else
 	WVP = World * camView * camProjection
 #endif
@@ -306,13 +280,6 @@ void Game::release()
 		textures[i]->Release();
 	delete[] textures;
 	delete this;
-}
-
-Game * Game::getInstance()
-{
-	if (instance == nullptr)
-		instance = new Game();
-	return instance;
 }
 
 Game::~Game()

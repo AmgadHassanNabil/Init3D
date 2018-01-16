@@ -1,6 +1,11 @@
 #pragma once
 
-#include "Headers.h"
+#include <windows.h>
+
+#include "Direct3D.h"
+#include "Camera.h"
+#include "Game.h"
+#include "Input.h"
 
 bool InitializeWindow(HINSTANCE hInstance,	int ShowWnd, int width, int height,	bool windowed);
 

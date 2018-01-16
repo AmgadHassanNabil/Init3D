@@ -11,37 +11,14 @@ Input::~Input()
 {
 }
 
-Input * Input::getInstance()
-{
-	if (instance == nullptr)
-		instance = new Input;
-	return instance;
-}
-
-IDirectInputDevice8 * Input::getKeyboard()
+IDirectInputDevice8 * Input::getKeyboard() const
 {
 	return this->DIKeyboard;
 }
 
-IDirectInputDevice8 * Input::getMouse()
+IDirectInputDevice8 * Input::getMouse() const
 {
 	return this->DIMouse;
-}
-
-void Input::getLastMouseState(DIMOUSESTATE & mouseLastState)
-{
-	mouseLastState = this->mouseLastState;
-}
-
-void Input::getLastKeyboardState(BYTE lastKeyboardState[])
-{
-	lastKeyboardState = this->lastKeyboardState;
-}
-
-void Input::setLastStates(DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[])
-{
-	this->mouseLastState = mouseCurrState;
-	this->lastKeyboardState = currKeyboardState;
 }
 
 bool Input::initDirectInput(HWND hwnd, HINSTANCE hInstance)

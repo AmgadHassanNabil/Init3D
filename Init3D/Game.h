@@ -1,7 +1,21 @@
 #pragma once
 
-#include "Headers.h"
+#include <windows.h>
+#include <d3d11.h>
+#include <DirectXMath.h>
+#include <DirectXPackedVector.h>
+#include <D3Dcompiler.h>
+#include <dinput.h>
+
+#include "Direct3D.h"
+#include "Camera.h"
+#include "Vertices.h"
+#include "WICTextureLoader.h"
+#include "Input.h"
+#include "FBXImporter.h"
+
 using namespace DirectX;
+
 
 class Game
 {
@@ -28,9 +42,7 @@ private:
 	XMMATRIX camView;
 	XMMATRIX camProjection;
 
-	XMVECTOR camPosition;
-	XMVECTOR camTarget;
-	XMVECTOR camUp;
+	Camera camera;
 
 	DWORD numberOfVerticies, numberOfIndicies, numberOfTextures;
 
@@ -61,5 +73,10 @@ public:
 	void draw(const int&);
 	void release();
 
-	static Game* getInstance();
+	inline static Game* getInstance() 
+	{
+		if (instance == nullptr)
+			instance = new Game();
+		return instance;
+	}
 };

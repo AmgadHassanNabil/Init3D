@@ -161,7 +161,7 @@ inline HRESULT FBXImporter::loadUVs(FbxMesh* pMesh, XMFLOAT2** uvs)
 	return S_OK;
 }
 
-inline HRESULT FBXImporter::loadTextures(FbxScene* pScene, DWORD& textureCount, ID3D11ShaderResourceView** &outModelTextures)
+inline HRESULT FBXImporter::loadTextures(ID3D11Device* device, FbxScene* pScene, DWORD& textureCount, ID3D11ShaderResourceView** &outModelTextures)
 {
 	HRESULT hr;
 	textureCount = pScene->GetTextureCount();
@@ -175,7 +175,7 @@ inline HRESULT FBXImporter::loadTextures(FbxScene* pScene, DWORD& textureCount, 
 		wchar_t wStr[100];
 		MultiByteToWideChar(CP_ACP, 0, str, -1, &wStr[0], fileNameLength + 1);
 		ID3D11ShaderResourceView* currTex = NULL;
-		hr = CreateWICTextureFromFile(AMD3D->d3d11Device, &wStr[0], nullptr, &currTex);
+		hr = CreateWICTextureFromFile(device, &wStr[0], nullptr, &currTex);
 
 		//failed to Load file release previous files that are loaded
 		if (FAILED(hr))
@@ -212,7 +212,7 @@ FBXImporter * FBXImporter::getInstance()
 	return instance;
 }
 
-HRESULT FBXImporter::parseFBX(const char * fileName,
+HRESULT FBXImporter::parseFBX(ID3D11Device* device, const char * fileName,
 	XMFLOAT3** verticiesPositions, DWORD &numberOfVerticies, 
 	DWORD** indicies, DWORD &numberOfIndicies,
 	XMFLOAT3** normals, XMFLOAT2** uvs,
@@ -252,7 +252,7 @@ HRESULT FBXImporter::parseFBX(const char * fileName,
 			ON_FAIL_RETURN_HRESULT(loadIndicies(pMesh, indicies, numberOfIndicies));
 			ON_FAIL_RETURN_HRESULT(loadNormals(pMesh, normals));
 			ON_FAIL_RETURN_HRESULT(loadUVs(pMesh, uvs));
-			ON_FAIL_RETURN_HRESULT(loadTextures(pFbxScene, textureCount, outModelTextures));
+			ON_FAIL_RETURN_HRESULT(loadTextures(device, pFbxScene, textureCount, outModelTextures));
 		}
 
 	}

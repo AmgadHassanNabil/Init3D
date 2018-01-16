@@ -1,7 +1,12 @@
 #pragma once
-#include"Headers.h"
-#include<fbxsdk.h>
-#include<vector>
+//#include"Headers.h"
+#include <windows.h>
+#include <fbxsdk.h>
+#include <vector>
+#include <DirectXMath.h>
+#include <d3d11.h>
+#include "WICTextureLoader.h"
+using namespace DirectX;
 
 class FBXImporter
 {
@@ -12,7 +17,7 @@ class FBXImporter
 	inline HRESULT loadIndicies(FbxMesh* pMesh, DWORD** indicies, DWORD &numberOfIndicies);
 	inline HRESULT loadNormals(FbxMesh* pMesh, XMFLOAT3** normals);
 	inline HRESULT loadUVs(FbxMesh* pMesh, XMFLOAT2** uvs);
-	inline HRESULT loadTextures(FbxScene* pScene, DWORD& textureCount, ID3D11ShaderResourceView** &modelTextures);
+	inline HRESULT loadTextures(ID3D11Device* device, FbxScene* pScene, DWORD& textureCount, ID3D11ShaderResourceView** &modelTextures);
 
 public:
 	FBXImporter();
@@ -20,7 +25,7 @@ public:
 
 	static FBXImporter* getInstance();
 
-	HRESULT parseFBX(const char * fileName,
+	HRESULT parseFBX(ID3D11Device* device, const char * fileName,
 		XMFLOAT3** verticiesPositions, DWORD &numberOfVerticies, 
 		DWORD** indicies, DWORD &numberOfIndicies,
 		XMFLOAT3** normals, XMFLOAT2** uvs,

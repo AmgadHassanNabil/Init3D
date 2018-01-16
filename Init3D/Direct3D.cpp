@@ -9,13 +9,6 @@ Direct3D::Direct3D()
 	ZeroMemory(this, sizeof(this));
 }
 
-Direct3D * Direct3D::getInstance()
-{
-	if (instance == nullptr)
-		instance = new Direct3D();
-	return instance;
-}
-
 bool Direct3D::initialize(HWND hwnd, HINSTANCE hInstance, const int width, const int height)
 {
 	HRESULT hr;
