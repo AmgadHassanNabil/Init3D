@@ -11,7 +11,7 @@ Game::Game()
 
 bool Game::loadModel()
 {
-	XMFLOAT3* positions = NULL;
+	/*XMFLOAT3* positions = NULL;
 	DWORD* indiciesF = NULL;
 	XMFLOAT3* normals = NULL;
 	DWORD numberOfNormals;
@@ -64,7 +64,8 @@ bool Game::loadModel()
 	delete[] modelVerticies;
 	delete[] positions;
 	delete[] normals;
-	delete[] uvs;
+	delete[] uvs;*/
+	return true;
 }
 
 bool Game::initialize(UINT width, UINT height)
@@ -72,82 +73,85 @@ bool Game::initialize(UINT width, UINT height)
 	this->width = width;
 	this->height = height;
 
-	VertexPositionNormalTexture cubeVerticies[] =
-	{
-		// Front Face
-		VertexPositionNormalTexture(-1.0f, -1.0f, -1.0f, 0.0f, 1.0f,-1.0f, -1.0f, -1.0f),
-		VertexPositionNormalTexture(-1.0f,  1.0f, -1.0f, 0.0f, 0.0f,-1.0f,  1.0f, -1.0f),
-		VertexPositionNormalTexture(1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 1.0f,  1.0f, -1.0f),
-		VertexPositionNormalTexture(1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, -1.0f, -1.0f),
 
-		// Back Face
-		VertexPositionNormalTexture(-1.0f, -1.0f, 1.0f, 1.0f, 1.0f,-1.0f, -1.0f, 1.0f),
-		VertexPositionNormalTexture(1.0f, -1.0f, 1.0f, 0.0f, 1.0f,  1.0f, -1.0f, 1.0f),
-		VertexPositionNormalTexture(1.0f,  1.0f, 1.0f, 0.0f, 0.0f,  1.0f,  1.0f, 1.0f),
-		VertexPositionNormalTexture(-1.0f,  1.0f, 1.0f, 1.0f, 0.0f,-1.0f,  1.0f, 1.0f),
+	effect = new Effect(L"TexturedEffect.fx");
+	model = new Model("D:\\Graphics\\SpaceShip.fbx", effect, sizeof(cbPerObject));
+	//VertexPositionNormalTexture cubeVerticies[] =
+	//{
+	//	// Front Face
+	//	VertexPositionNormalTexture(-1.0f, -1.0f, -1.0f, 0.0f, 1.0f,-1.0f, -1.0f, -1.0f),
+	//	VertexPositionNormalTexture(-1.0f,  1.0f, -1.0f, 0.0f, 0.0f,-1.0f,  1.0f, -1.0f),
+	//	VertexPositionNormalTexture(1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 1.0f,  1.0f, -1.0f),
+	//	VertexPositionNormalTexture(1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, -1.0f, -1.0f),
 
-		// Top Face
-		VertexPositionNormalTexture(-1.0f, 1.0f, -1.0f, 0.0f, 1.0f,-1.0f, 1.0f, -1.0f),
-		VertexPositionNormalTexture(-1.0f, 1.0f,  1.0f, 0.0f, 0.0f,-1.0f, 1.0f,  1.0f),
-		VertexPositionNormalTexture(1.0f, 1.0f,  1.0f, 1.0f, 0.0f,  1.0f, 1.0f,  1.0f),
-		VertexPositionNormalTexture(1.0f, 1.0f, -1.0f, 1.0f, 1.0f,  1.0f, 1.0f, -1.0f),
+	//	// Back Face
+	//	VertexPositionNormalTexture(-1.0f, -1.0f, 1.0f, 1.0f, 1.0f,-1.0f, -1.0f, 1.0f),
+	//	VertexPositionNormalTexture(1.0f, -1.0f, 1.0f, 0.0f, 1.0f,  1.0f, -1.0f, 1.0f),
+	//	VertexPositionNormalTexture(1.0f,  1.0f, 1.0f, 0.0f, 0.0f,  1.0f,  1.0f, 1.0f),
+	//	VertexPositionNormalTexture(-1.0f,  1.0f, 1.0f, 1.0f, 0.0f,-1.0f,  1.0f, 1.0f),
 
-		// Bottom Face
-		VertexPositionNormalTexture(-1.0f, -1.0f, -1.0f, 1.0f, 1.0f,-1.0f, -1.0f, -1.0f),
-		VertexPositionNormalTexture(1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, -1.0f, -1.0f),
-		VertexPositionNormalTexture(1.0f, -1.0f,  1.0f, 0.0f, 0.0f, 1.0f, -1.0f,  1.0f),
-		VertexPositionNormalTexture(-1.0f, -1.0f,  1.0f, 1.0f, 0.0f,-1.0f, -1.0f,  1.0f),
+	//	// Top Face
+	//	VertexPositionNormalTexture(-1.0f, 1.0f, -1.0f, 0.0f, 1.0f,-1.0f, 1.0f, -1.0f),
+	//	VertexPositionNormalTexture(-1.0f, 1.0f,  1.0f, 0.0f, 0.0f,-1.0f, 1.0f,  1.0f),
+	//	VertexPositionNormalTexture(1.0f, 1.0f,  1.0f, 1.0f, 0.0f,  1.0f, 1.0f,  1.0f),
+	//	VertexPositionNormalTexture(1.0f, 1.0f, -1.0f, 1.0f, 1.0f,  1.0f, 1.0f, -1.0f),
 
-		// Left Face
-		VertexPositionNormalTexture(-1.0f, -1.0f,  1.0f, 0.0f, 1.0f,-1.0f, -1.0f,  1.0f),
-		VertexPositionNormalTexture(-1.0f,  1.0f,  1.0f, 0.0f, 0.0f,-1.0f,  1.0f,  1.0f),
-		VertexPositionNormalTexture(-1.0f,  1.0f, -1.0f, 1.0f, 0.0f,-1.0f,  1.0f, -1.0f),
-		VertexPositionNormalTexture(-1.0f, -1.0f, -1.0f, 1.0f, 1.0f,-1.0f, -1.0f, -1.0f),
+	//	// Bottom Face
+	//	VertexPositionNormalTexture(-1.0f, -1.0f, -1.0f, 1.0f, 1.0f,-1.0f, -1.0f, -1.0f),
+	//	VertexPositionNormalTexture(1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, -1.0f, -1.0f),
+	//	VertexPositionNormalTexture(1.0f, -1.0f,  1.0f, 0.0f, 0.0f, 1.0f, -1.0f,  1.0f),
+	//	VertexPositionNormalTexture(-1.0f, -1.0f,  1.0f, 1.0f, 0.0f,-1.0f, -1.0f,  1.0f),
 
-		// Right Face
-		VertexPositionNormalTexture(1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, -1.0f, -1.0f),
-		VertexPositionNormalTexture(1.0f,  1.0f, -1.0f, 0.0f, 0.0f, 1.0f,  1.0f, -1.0f),
-		VertexPositionNormalTexture(1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 1.0f,  1.0f,  1.0f),
-		VertexPositionNormalTexture(1.0f, -1.0f,  1.0f, 1.0f, 1.0f,1.0f, -1.0f,  1.0f),
-	};
+	//	// Left Face
+	//	VertexPositionNormalTexture(-1.0f, -1.0f,  1.0f, 0.0f, 1.0f,-1.0f, -1.0f,  1.0f),
+	//	VertexPositionNormalTexture(-1.0f,  1.0f,  1.0f, 0.0f, 0.0f,-1.0f,  1.0f,  1.0f),
+	//	VertexPositionNormalTexture(-1.0f,  1.0f, -1.0f, 1.0f, 0.0f,-1.0f,  1.0f, -1.0f),
+	//	VertexPositionNormalTexture(-1.0f, -1.0f, -1.0f, 1.0f, 1.0f,-1.0f, -1.0f, -1.0f),
 
-	DWORD indices[] = {
-		// Front Face
-		0,  1,  2,
-		0,  2,  3,
+	//	// Right Face
+	//	VertexPositionNormalTexture(1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, -1.0f, -1.0f),
+	//	VertexPositionNormalTexture(1.0f,  1.0f, -1.0f, 0.0f, 0.0f, 1.0f,  1.0f, -1.0f),
+	//	VertexPositionNormalTexture(1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 1.0f,  1.0f,  1.0f),
+	//	VertexPositionNormalTexture(1.0f, -1.0f,  1.0f, 1.0f, 1.0f,1.0f, -1.0f,  1.0f),
+	//};
 
-		// Back Face
-		4,  5,  6,
-		4,  6,  7,
+	//DWORD indices[] = {
+	//	// Front Face
+	//	0,  1,  2,
+	//	0,  2,  3,
 
-		// Top Face
-		8,  9, 10,
-		8, 10, 11,
+	//	// Back Face
+	//	4,  5,  6,
+	//	4,  6,  7,
 
-		// Bottom Face
-		12, 13, 14,
-		12, 14, 15,
+	//	// Top Face
+	//	8,  9, 10,
+	//	8, 10, 11,
 
-		// Left Face
-		16, 17, 18,
-		16, 18, 19,
+	//	// Bottom Face
+	//	12, 13, 14,
+	//	12, 14, 15,
 
-		// Right Face
-		20, 21, 22,
-		20, 22, 23
-	};
+	//	// Left Face
+	//	16, 17, 18,
+	//	16, 18, 19,
+
+	//	// Right Face
+	//	20, 21, 22,
+	//	20, 22, 23
+	//};
 
 	HRESULT hr;
 	
-	hr = CompileShader(L"TexturedEffect.fx", "VS", "vs_5_0", &VS_Buffer);
-	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "VertexShader Loading - Failed", "Error");
-	hr = CompileShader(L"TexturedEffect.fx", "PS", "ps_5_0", &PS_Buffer);
-	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "PixelShader Loading - Failed", "Error");
+	//hr = CompileShader(L"TexturedEffect.fx", "VS", "vs_5_0", &VS_Buffer);
+	//SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "VertexShader Loading - Failed", "Error");
+	//hr = CompileShader(L"TexturedEffect.fx", "PS", "ps_5_0", &PS_Buffer);
+	//SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "PixelShader Loading - Failed", "Error");
 
-	hr = AMD3D->d3d11Device->CreateVertexShader(VS_Buffer->GetBufferPointer(), VS_Buffer->GetBufferSize(), NULL, &VS);
-	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "VertexShader Creating - Failed", "Error");
-	hr = AMD3D->d3d11Device->CreatePixelShader(PS_Buffer->GetBufferPointer(), PS_Buffer->GetBufferSize(), NULL, &PS);
-	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "PixelShader Creating - Failed", "Error");
+	//hr = AMD3D->d3d11Device->CreateVertexShader(VS_Buffer->GetBufferPointer(), VS_Buffer->GetBufferSize(), NULL, &VS);
+	//SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "VertexShader Creating - Failed", "Error");
+	//hr = AMD3D->d3d11Device->CreatePixelShader(PS_Buffer->GetBufferPointer(), PS_Buffer->GetBufferSize(), NULL, &PS);
+	//SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "PixelShader Creating - Failed", "Error");
 
 	//D3D11_BUFFER_DESC vertexBufferDesc;
 	//ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
@@ -182,32 +186,32 @@ bool Game::initialize(UINT width, UINT height)
 	//	VS_Buffer->GetBufferSize(), &vertLayout);
 	//SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Input Layout Creation - Failed", "Error");
 
-	D3D11_BUFFER_DESC cbbd;
-	ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
-	cbbd.Usage = D3D11_USAGE_DEFAULT;
-	cbbd.ByteWidth = sizeof(cbPerObject);
-	cbbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbbd.CPUAccessFlags = 0;
-	cbbd.MiscFlags = 0;
-	hr = AMD3D->d3d11Device->CreateBuffer(&cbbd, NULL, &cbPerObjectBuffer);
-	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Constant Buffer Creation - Failed", "Error");
+	//D3D11_BUFFER_DESC cbbd;
+	//ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
+	//cbbd.Usage = D3D11_USAGE_DEFAULT;
+	//cbbd.ByteWidth = sizeof(cbPerObject);
+	//cbbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	//cbbd.CPUAccessFlags = 0;
+	//cbbd.MiscFlags = 0;
+	//hr = AMD3D->d3d11Device->CreateBuffer(&cbbd, NULL, &cbPerObjectBuffer);
+	//SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Constant Buffer Creation - Failed", "Error");
 
-	loadModel();
+	//loadModel();
 
 	camProjection = XMMatrixPerspectiveFovLH(0.4f*3.14f, (float)width / height, 1.0f, 1000.0f);
 	
-	D3D11_SAMPLER_DESC sampDesc;
-	ZeroMemory(&sampDesc, sizeof(sampDesc));
-	sampDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
-	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
-	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
-	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-	sampDesc.MaxAnisotropy = 4;
-	sampDesc.MinLOD = 0;
-	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-	hr = AMD3D->d3d11Device->CreateSamplerState(&sampDesc, &CubesTexSamplerState);
-	SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Sampler State Creation - Failed", "Error");
+	//D3D11_SAMPLER_DESC sampDesc;
+	//ZeroMemory(&sampDesc, sizeof(sampDesc));
+	//sampDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	//sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
+	//sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
+	//sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
+	//sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	//sampDesc.MaxAnisotropy = 4;
+	//sampDesc.MinLOD = 0;
+	//sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	//hr = AMD3D->d3d11Device->CreateSamplerState(&sampDesc, &CubesTexSamplerState);
+	//SHOW_AND_RETURN_ERROR_ON_FAIL(hr, "Sampler State Creation - Failed", "Error");
 
 
 	return true;
@@ -232,53 +236,57 @@ void Game::draw(const int& fps)
 	AMD3D->d3d11DevCon->ClearRenderTargetView(AMD3D->renderTargetView, bgColor);
 	AMD3D->d3d11DevCon->ClearDepthStencilView(AMD3D->depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	//camera.getView(camView);
+	camera.getView(camView);
 	
 #ifdef _WIN64
-	WVP = XMMatrixMultiply(World, XMMatrixMultiply(camera.camView, camProjection));
+	WVP = XMMatrixMultiply(World, XMMatrixMultiply(camView, camProjection));
 #else
 	WVP = World * camView * camProjection
 #endif
 	cbPerObj.WVP = XMMatrixTranspose(WVP);
 	cbPerObj.World = XMMatrixTranspose(World);
 	cbPerObj.lightDirection = XMFLOAT3(0.3f, 0.5f, 0.2f);
-	AMD3D->d3d11DevCon->UpdateSubresource(cbPerObjectBuffer, 0, NULL, &cbPerObj, 0, 0);
-	AMD3D->d3d11DevCon->VSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
-	AMD3D->d3d11DevCon->PSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
-	AMD3D->d3d11DevCon->PSSetShaderResources(0, 1, &textures[0]);
-	AMD3D->d3d11DevCon->PSSetSamplers(0, 1, &CubesTexSamplerState);
+	//AMD3D->d3d11DevCon->UpdateSubresource(cbPerObjectBuffer, 0, NULL, &cbPerObj, 0, 0);
+	//AMD3D->d3d11DevCon->VSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
+	//AMD3D->d3d11DevCon->PSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
+	//AMD3D->d3d11DevCon->PSSetShaderResources(0, 1, &textures[0]);
+	//AMD3D->d3d11DevCon->PSSetSamplers(0, 1, &CubesTexSamplerState);
 
-	AMD3D->d3d11DevCon->VSSetShader(VS, NULL, NULL);
-	AMD3D->d3d11DevCon->PSSetShader(PS, NULL, NULL);
+	//AMD3D->d3d11DevCon->VSSetShader(VS, NULL, NULL);
+	//AMD3D->d3d11DevCon->PSSetShader(PS, NULL, NULL);
 
-	UINT stride = sizeof(VertexPositionNormalTexture);
-	UINT offset = 0;
-	AMD3D->d3d11DevCon->IASetVertexBuffers(0, 1, &cubeVertBuffer, &stride, &offset);
-	AMD3D->d3d11DevCon->IASetIndexBuffer(cubeIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	//UINT stride = sizeof(VertexPositionNormalTexture);
+	//UINT offset = 0;
+	//AMD3D->d3d11DevCon->IASetVertexBuffers(0, 1, &cubeVertBuffer, &stride, &offset);
+	//AMD3D->d3d11DevCon->IASetIndexBuffer(cubeIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-	AMD3D->d3d11DevCon->IASetInputLayout(vertLayout);
+	//AMD3D->d3d11DevCon->IASetInputLayout(vertLayout);
 
-	AMD3D->d3d11DevCon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	//AMD3D->d3d11DevCon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	AMD3D->d3d11DevCon->DrawIndexed(numberOfIndicies, 0, 0);
-
+	//AMD3D->d3d11DevCon->DrawIndexed(numberOfIndicies, 0, 0);
+	model->draw(&cbPerObj);
 	AMD3D->SwapChain->Present(0, 0);
 }
 
 void Game::release()
 {
-	VS_Buffer->Release();
-	PS_Buffer->Release();
-	cubeVertBuffer->Release();
-	cubeIndexBuffer->Release();
-	vertLayout->Release();
-	VS->Release();
-	PS->Release();
-	cbPerObjectBuffer->Release();
-	CubesTexSamplerState->Release();
-	for (int i = 0; i < numberOfTextures; i++)
-		textures[i]->Release();
-	delete[] textures;
+	//VS_Buffer->Release();
+	//PS_Buffer->Release();
+	//cubeVertBuffer->Release();
+	//cubeIndexBuffer->Release();
+	//vertLayout->Release();
+	//VS->Release();
+	//PS->Release();
+	//cbPerObjectBuffer->Release();
+	//CubesTexSamplerState->Release();
+	//for (int i = 0; i < numberOfTextures; i++)
+	//	textures[i]->Release();
+	//delete[] textures;
+	model->release();
+	delete model;
+	effect->release();
+	delete effect;
 	delete this;
 }
 

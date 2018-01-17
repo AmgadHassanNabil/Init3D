@@ -154,6 +154,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Direct3D.cpp" />
+    <ClCompile Include="Effect.cpp" />
     <ClCompile Include="FBXImporter.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Input.cpp" />
@@ -164,6 +165,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Direct3D.h" />
+    <ClInclude Include="Effect.h" />
     <ClInclude Include="FBXImporter.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Defines.h" />

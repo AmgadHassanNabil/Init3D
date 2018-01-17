@@ -13,6 +13,8 @@
 #include "WICTextureLoader.h"
 #include "Input.h"
 #include "FBXImporter.h"
+#include "Model.h"
+#include "Effect.h"
 
 using namespace DirectX;
 
@@ -24,18 +26,19 @@ private:
 	const FLOAT bgColor[4] = { 0.0f, 0.0f, 0.7f, 1.0f };
 	UINT width, height;
 
-	ID3D11VertexShader* VS;
-	ID3D11PixelShader* PS;
-	ID3D11Buffer* cubeVertBuffer;
-	ID3D11Buffer* cubeIndexBuffer;
-	ID3D11InputLayout* vertLayout;
-	ID3DBlob* VS_Buffer = NULL;
-	ID3DBlob* PS_Buffer = NULL;
-	ID3DBlob* errorBlob = NULL;
-	ID3D11Buffer* cbPerObjectBuffer;
-
-	ID3D11ShaderResourceView** textures;
-	ID3D11SamplerState* CubesTexSamplerState;
+	//ID3D11VertexShader* VS;
+	//ID3D11PixelShader* PS;
+	//ID3D11Buffer* cubeVertBuffer;
+	//ID3D11Buffer* cubeIndexBuffer;
+	//ID3D11InputLayout* vertLayout;
+	//ID3DBlob* VS_Buffer = NULL;
+	//ID3DBlob* PS_Buffer = NULL;
+	//ID3DBlob* errorBlob = NULL;
+	//ID3D11Buffer* cbPerObjectBuffer;
+	Model* model;
+	Effect* effect;
+	//ID3D11ShaderResourceView** textures;
+	//ID3D11SamplerState* CubesTexSamplerState;
 
 	XMMATRIX WVP;
 	XMMATRIX World;
@@ -44,7 +47,7 @@ private:
 
 	Camera camera;
 
-	DWORD numberOfVerticies, numberOfIndicies, numberOfTextures;
+	//DWORD numberOfVerticies, numberOfIndicies, numberOfTextures;
 
 	struct cbPerObject
 	{
