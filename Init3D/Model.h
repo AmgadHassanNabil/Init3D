@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <d3d11.h>
 #include <DirectXMath.h>
+#include <fbxsdk.h>
 
 #include "FBXImporter.h"
 #include "Defines.h"
@@ -20,12 +21,14 @@ class Model
 	Effect *effect;
 	ID3D11Buffer* cbPerObjectBuffer;
 
-	Model();
 	Model(const Model&);
 	Model& operator=(const Model&);
 public:
 	~Model();
-	Model(const char*, Effect *effect, UINT sizeOfConstantBuffer);
+	Model();
+
+	HRESULT loadFromFile(const char* fileName, Effect *effect, const UINT sizeOfConstantBufferz);
+	HRESULT createTexturedCube(Effect *effect, const UINT sizeOfConstantBuffer);
 	void draw(const void* constantBufferData);
 	void release();
 };

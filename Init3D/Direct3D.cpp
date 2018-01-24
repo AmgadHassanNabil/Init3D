@@ -1,7 +1,5 @@
 #include "Direct3D.h"
 
-//#include<stdio.h>
-
 Direct3D* Direct3D::instance;
 
 Direct3D::Direct3D()
@@ -104,7 +102,7 @@ bool Direct3D::initialize(HWND hwnd, HINSTANCE hInstance, const int width, const
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
 
-	Direct3D::getInstance()->d3d11DevCon->RSSetViewports(1, &viewport);
+	d3d11DevCon->RSSetViewports(1, &viewport);
 
 	D3D11_RASTERIZER_DESC wfdesc;
 	ZeroMemory(&wfdesc, sizeof(D3D11_RASTERIZER_DESC));

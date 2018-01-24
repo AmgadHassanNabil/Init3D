@@ -4,25 +4,34 @@ Model::Model()
 {
 }
 
-Model::Model(const char* fileName, Effect *effect, const UINT sizeOfConstantBuffer)
+HRESULT Model::loadFromFile(const char * fileName, Effect * effect, const UINT sizeOfConstantBuffer)
 {
 	this->effect = effect;
-	XMFLOAT3* positions = NULL;
+	FbxVector4* positions = NULL;
 	DWORD* indiciesF = NULL;
-	XMFLOAT3* normals = NULL;
+	FbxVector4* normals = NULL;
 	DWORD numberOfNormals;
-	XMFLOAT2* uvs = NULL;
+	FbxVector2* uvs = NULL;
 
 	HRESULT hr = FBXImporter::getInstance()->parseFBX(AMD3D->d3d11Device, fileName,
 		&positions, numberOfVerticies,
 		&indiciesF, numberOfIndicies,
 		&normals, &uvs, textures, numberOfTextures);
-	assert(SUCCEEDED(hr));
+	if (FAILED(hr)) return hr;
 
 	VertexPositionNormalTexture* modelVerticies = new VertexPositionNormalTexture[numberOfVerticies];
 
 	for (DWORD i = 0; i < numberOfVerticies; i++)
-		modelVerticies[i] = VertexPositionNormalTexture(positions[i], uvs[i], normals[i]);
+	{
+		FbxVector4 position = positions[i];
+		FbxVector4 normal = normals[i];
+		FbxVector2 uv = uvs[i];
+		modelVerticies[i] = VertexPositionNormalTexture(XMFLOAT3(position.mData[0], position.mData[1], position.mData[2]),
+			XMFLOAT2(uv.mData[0], uv.mData[1]),
+			XMFLOAT3(normal.mData[0], normal.mData[1], normal.mData[2]));
+	}
+	delete[] normals;
+	delete[] uvs;
 
 	D3D11_BUFFER_DESC vertexBufferDesc;
 	ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
@@ -38,7 +47,7 @@ Model::Model(const char* fileName, Effect *effect, const UINT sizeOfConstantBuff
 	ZeroMemory(&vertexBufferData, sizeof(vertexBufferData));
 	vertexBufferData.pSysMem = modelVerticies;
 	hr = AMD3D->d3d11Device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &vertBuffer);
-	assert(SUCCEEDED(hr));
+	if (FAILED(hr)) return hr;
 
 	D3D11_BUFFER_DESC indexBufferDesc;
 	ZeroMemory(&indexBufferDesc, sizeof(indexBufferDesc));
@@ -51,11 +60,11 @@ Model::Model(const char* fileName, Effect *effect, const UINT sizeOfConstantBuff
 	D3D11_SUBRESOURCE_DATA iinitData;
 	iinitData.pSysMem = indiciesF;
 	hr = AMD3D->d3d11Device->CreateBuffer(&indexBufferDesc, &iinitData, &indexBuffer);
-	assert(SUCCEEDED(hr));
+	if (FAILED(hr)) return hr;
 
 	hr = AMD3D->d3d11Device->CreateInputLayout(VertexPositionNormalTexture::layout, VertexPositionNormalTexture::numElements, effect->VS_Buffer->GetBufferPointer(),
 		effect->VS_Buffer->GetBufferSize(), &vertLayout);
-	assert(SUCCEEDED(hr));
+	if (FAILED(hr)) return hr;
 
 	D3D11_BUFFER_DESC cbbd;
 	ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
@@ -65,7 +74,7 @@ Model::Model(const char* fileName, Effect *effect, const UINT sizeOfConstantBuff
 	cbbd.CPUAccessFlags = 0;
 	cbbd.MiscFlags = 0;
 	hr = AMD3D->d3d11Device->CreateBuffer(&cbbd, NULL, &cbPerObjectBuffer);
-	assert(SUCCEEDED(hr));
+	if (FAILED(hr)) return hr;
 
 	D3D11_SAMPLER_DESC sampDesc;
 	ZeroMemory(&sampDesc, sizeof(sampDesc));
@@ -80,9 +89,76 @@ Model::Model(const char* fileName, Effect *effect, const UINT sizeOfConstantBuff
 	hr = AMD3D->d3d11Device->CreateSamplerState(&sampDesc, &textureSamplerState);
 
 	delete[] modelVerticies;
-	delete[] positions;
-	delete[] normals;
-	delete[] uvs;
+	return S_OK;
+}
+
+HRESULT Model::createTexturedCube(Effect * effect, const UINT sizeOfConstantBuffer)
+{
+	VertexPositionNormalTexture cubeVerticies[] =
+	{
+		// Front Face
+		VertexPositionNormalTexture(-1.0f, -1.0f, -1.0f, 0.0f, 1.0f,-1.0f, -1.0f, -1.0f),
+		VertexPositionNormalTexture(-1.0f,  1.0f, -1.0f, 0.0f, 0.0f,-1.0f,  1.0f, -1.0f),
+		VertexPositionNormalTexture(1.0f,  1.0f, -1.0f, 1.0f, 0.0f, 1.0f,  1.0f, -1.0f),
+		VertexPositionNormalTexture(1.0f, -1.0f, -1.0f, 1.0f, 1.0f, 1.0f, -1.0f, -1.0f),
+
+		// Back Face
+		VertexPositionNormalTexture(-1.0f, -1.0f, 1.0f, 1.0f, 1.0f,-1.0f, -1.0f, 1.0f),
+		VertexPositionNormalTexture(1.0f, -1.0f, 1.0f, 0.0f, 1.0f,  1.0f, -1.0f, 1.0f),
+		VertexPositionNormalTexture(1.0f,  1.0f, 1.0f, 0.0f, 0.0f,  1.0f,  1.0f, 1.0f),
+		VertexPositionNormalTexture(-1.0f,  1.0f, 1.0f, 1.0f, 0.0f,-1.0f,  1.0f, 1.0f),
+
+		// Top Face
+		VertexPositionNormalTexture(-1.0f, 1.0f, -1.0f, 0.0f, 1.0f,-1.0f, 1.0f, -1.0f),
+		VertexPositionNormalTexture(-1.0f, 1.0f,  1.0f, 0.0f, 0.0f,-1.0f, 1.0f,  1.0f),
+		VertexPositionNormalTexture(1.0f, 1.0f,  1.0f, 1.0f, 0.0f,  1.0f, 1.0f,  1.0f),
+		VertexPositionNormalTexture(1.0f, 1.0f, -1.0f, 1.0f, 1.0f,  1.0f, 1.0f, -1.0f),
+
+		// Bottom Face
+		VertexPositionNormalTexture(-1.0f, -1.0f, -1.0f, 1.0f, 1.0f,-1.0f, -1.0f, -1.0f),
+		VertexPositionNormalTexture(1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, -1.0f, -1.0f),
+		VertexPositionNormalTexture(1.0f, -1.0f,  1.0f, 0.0f, 0.0f, 1.0f, -1.0f,  1.0f),
+		VertexPositionNormalTexture(-1.0f, -1.0f,  1.0f, 1.0f, 0.0f,-1.0f, -1.0f,  1.0f),
+
+		// Left Face
+		VertexPositionNormalTexture(-1.0f, -1.0f,  1.0f, 0.0f, 1.0f,-1.0f, -1.0f,  1.0f),
+		VertexPositionNormalTexture(-1.0f,  1.0f,  1.0f, 0.0f, 0.0f,-1.0f,  1.0f,  1.0f),
+		VertexPositionNormalTexture(-1.0f,  1.0f, -1.0f, 1.0f, 0.0f,-1.0f,  1.0f, -1.0f),
+		VertexPositionNormalTexture(-1.0f, -1.0f, -1.0f, 1.0f, 1.0f,-1.0f, -1.0f, -1.0f),
+
+		// Right Face
+		VertexPositionNormalTexture(1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, -1.0f, -1.0f),
+		VertexPositionNormalTexture(1.0f,  1.0f, -1.0f, 0.0f, 0.0f, 1.0f,  1.0f, -1.0f),
+		VertexPositionNormalTexture(1.0f,  1.0f,  1.0f, 1.0f, 0.0f, 1.0f,  1.0f,  1.0f),
+		VertexPositionNormalTexture(1.0f, -1.0f,  1.0f, 1.0f, 1.0f,1.0f, -1.0f,  1.0f),
+	};
+
+	DWORD indices[] = {
+		// Front Face
+		0,  1,  2,
+		0,  2,  3,
+
+		// Back Face
+		4,  5,  6,
+		4,  6,  7,
+
+		// Top Face
+		8,  9, 10,
+		8, 10, 11,
+
+		// Bottom Face
+		12, 13, 14,
+		12, 14, 15,
+
+		// Left Face
+		16, 17, 18,
+		16, 18, 19,
+
+		// Right Face
+		20, 21, 22,
+		20, 22, 23
+	};
+	return S_OK;
 }
 
 void Model::draw(const void* constantBufferData)

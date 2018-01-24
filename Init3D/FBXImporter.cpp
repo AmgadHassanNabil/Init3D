@@ -5,16 +5,10 @@
 
 FBXImporter* FBXImporter::instance;
 
-inline HRESULT FBXImporter::loadVerteciesPositions(FbxMesh* pMesh, XMFLOAT3** verticiesPositions, DWORD &numberOfVerticies)
+inline HRESULT FBXImporter::loadVerteciesPositions(FbxMesh* pMesh, FbxVector4** verticiesPositions, DWORD &numberOfVerticies)
 {
 	numberOfVerticies = pMesh->GetControlPointsCount();
-	*verticiesPositions = new XMFLOAT3[numberOfVerticies];
-
-	for (DWORD j = 0; j < numberOfVerticies; j++)
-	{
-		FbxVector4 Vertex = pMesh->GetControlPointAt(j);
-		(*verticiesPositions)[j] = XMFLOAT3((float)Vertex.mData[0], (float)Vertex.mData[1], (float)Vertex.mData[2]);
-	}
+	(*verticiesPositions) = pMesh->GetControlPoints();
 	return S_OK;
 }
 
@@ -26,7 +20,7 @@ inline HRESULT FBXImporter::loadIndicies(FbxMesh* pMesh, DWORD** indicies, DWORD
 	return S_OK;
 }
 
-inline HRESULT FBXImporter::loadNormals(FbxMesh* pMesh, XMFLOAT3** normals)
+inline HRESULT FBXImporter::loadNormals(FbxMesh* pMesh, FbxVector4** normals)
 {
 	//pMesh->GenerateNormals(true, true);
 	FbxGeometryElementNormal* lNormalElement = pMesh->GetElementNormal();
@@ -35,7 +29,7 @@ inline HRESULT FBXImporter::loadNormals(FbxMesh* pMesh, XMFLOAT3** normals)
 		if (lNormalElement->GetMappingMode() == FbxGeometryElement::eByControlPoint)
 		{
 			int numberOfNormals = pMesh->GetControlPointsCount();
-			*normals = new XMFLOAT3[numberOfNormals];
+			*normals = new FbxVector4[numberOfNormals];
 
 			for (int lVertexIndex = 0; lVertexIndex < numberOfNormals; lVertexIndex++)
 			{
@@ -46,8 +40,7 @@ inline HRESULT FBXImporter::loadNormals(FbxMesh* pMesh, XMFLOAT3** normals)
 				if (lNormalElement->GetReferenceMode() == FbxGeometryElement::eIndexToDirect)
 					lNormalIndex = lNormalElement->GetIndexArray().GetAt(lVertexIndex);
 
-				FbxVector4 lNormal = lNormalElement->GetDirectArray().GetAt(lNormalIndex);
-				(*normals)[lNormalIndex] = XMFLOAT3(lNormal[0], lNormal[1], lNormal[2]);
+				(*normals)[lNormalIndex] = lNormalElement->GetDirectArray().GetAt(lNormalIndex);
 			}
 		}
 		else if (lNormalElement->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
@@ -83,7 +76,7 @@ inline HRESULT FBXImporter::loadNormals(FbxMesh* pMesh, XMFLOAT3** normals)
 	return S_OK;
 }
 
-inline HRESULT FBXImporter::loadUVs(FbxMesh* pMesh, XMFLOAT2** uvs)
+inline HRESULT FBXImporter::loadUVs(FbxMesh* pMesh, FbxVector2** uvs)
 {
 	FbxStringList lUVSetNameList;
 	pMesh->GetUVSetNames(lUVSetNameList);
@@ -109,7 +102,7 @@ inline HRESULT FBXImporter::loadUVs(FbxMesh* pMesh, XMFLOAT2** uvs)
 
 		//iterating through the data by polygon
 		const int lPolyCount = pMesh->GetPolygonCount();
-		*uvs = new XMFLOAT2[lPolyCount * 3];
+		*uvs = new FbxVector2[lPolyCount * 3];
 
 		if (lUVElement->GetMappingMode() == FbxGeometryElement::eByControlPoint)
 		{
@@ -125,8 +118,7 @@ inline HRESULT FBXImporter::loadUVs(FbxMesh* pMesh, XMFLOAT2** uvs)
 					//the UV index depends on the reference mode
 					int lUVIndex = lUseIndex ? lUVElement->GetIndexArray().GetAt(lPolyVertIndex) : lPolyVertIndex;
 
-					FbxVector2 lUVValue = lUVElement->GetDirectArray().GetAt(lUVIndex);
-					(*uvs)[lUVIndex] = XMFLOAT2(lUVValue.mData[0], lUVValue.mData[1]);
+					(*uvs)[lUVIndex] = lUVElement->GetDirectArray().GetAt(lUVIndex);
 				}
 			}
 		}
@@ -213,9 +205,9 @@ FBXImporter * FBXImporter::getInstance()
 }
 
 HRESULT FBXImporter::parseFBX(ID3D11Device* device, const char * fileName,
-	XMFLOAT3** verticiesPositions, DWORD &numberOfVerticies, 
+	FbxVector4** verticiesPositions, DWORD &numberOfVerticies,
 	DWORD** indicies, DWORD &numberOfIndicies,
-	XMFLOAT3** normals, XMFLOAT2** uvs,
+	FbxVector4** normals, FbxVector2** uvs,
 	ID3D11ShaderResourceView** &outModelTextures, DWORD &textureCount)
 {
 	FbxImporter* pImporter = FbxImporter::Create(g_pFbxSdkManager, "");
@@ -253,6 +245,71 @@ HRESULT FBXImporter::parseFBX(ID3D11Device* device, const char * fileName,
 			ON_FAIL_RETURN_HRESULT(loadNormals(pMesh, normals));
 			ON_FAIL_RETURN_HRESULT(loadUVs(pMesh, uvs));
 			ON_FAIL_RETURN_HRESULT(loadTextures(device, pFbxScene, textureCount, outModelTextures));
+		}
+
+	}
+	return S_OK;
+}
+
+HRESULT FBXImporter::parseFBX(ID3D11Device * device, const char * fileName, VertexPositionNormalTexture ** modelVerticies, DWORD & numberOfVerticies, DWORD** indicies, DWORD & numberOfIndicies, ID3D11ShaderResourceView **& outModelTextures, DWORD & numberOfTextures)
+{
+	FbxImporter* pImporter = FbxImporter::Create(g_pFbxSdkManager, "");
+	FbxScene* pFbxScene = FbxScene::Create(g_pFbxSdkManager, "");
+	bool bSuccess = pImporter->Initialize(fileName, -1, g_pFbxSdkManager->GetIOSettings());
+	if (!bSuccess) return E_FAIL;
+
+	bSuccess = pImporter->Import(pFbxScene);
+	if (!bSuccess) return ERROR_FILE_NOT_FOUND;
+
+	pImporter->Destroy();
+
+	FbxNode* pFbxRootNode = pFbxScene->GetRootNode();
+
+	if (pFbxRootNode)
+	{
+		for (int i = 0; i < pFbxRootNode->GetChildCount(); i++)
+		{
+			FbxNode* pFbxChildNode = pFbxRootNode->GetChild(i);
+
+			if (pFbxChildNode->GetNodeAttribute() == NULL)
+				continue;
+
+			FbxNodeAttribute::EType AttributeType = pFbxChildNode->GetNodeAttribute()->GetAttributeType();
+
+			if (AttributeType != FbxNodeAttribute::eMesh)
+				continue;
+
+			FbxMesh* pMesh = pFbxChildNode->GetMesh();
+			bSuccess = pMesh->SplitPoints();
+			if (!bSuccess) return E_FAIL;
+
+			
+			FbxGeometryElementNormal* lNormalElement = pMesh->GetElementNormal();
+			if (lNormalElement)
+			{
+				if (lNormalElement->GetMappingMode() == FbxGeometryElement::eByControlPoint)
+				{
+					int numberOfVerticies = pMesh->GetControlPointsCount();
+					*modelVerticies = new VertexPositionNormalTexture[numberOfVerticies];
+
+					for (int lVertexIndex = 0; lVertexIndex < numberOfVerticies; lVertexIndex++)
+					{
+						FbxVector4 Vertex = pMesh->GetControlPointAt(lVertexIndex);
+						(*modelVerticies)[lVertexIndex].pos = XMFLOAT3((float)Vertex.mData[0], (float)Vertex.mData[1], (float)Vertex.mData[2]);
+
+						int lNormalIndex = 0;
+						if (lNormalElement->GetReferenceMode() == FbxGeometryElement::eDirect)
+							lNormalIndex = lVertexIndex;
+
+						if (lNormalElement->GetReferenceMode() == FbxGeometryElement::eIndexToDirect)
+							lNormalIndex = lNormalElement->GetIndexArray().GetAt(lVertexIndex);
+
+						FbxVector4 lNormal = lNormalElement->GetDirectArray().GetAt(lNormalIndex);
+						(*modelVerticies)[lNormalIndex].normal = XMFLOAT3(lNormal[0], lNormal[1], lNormal[2]);
+					}
+				}
+			}
+			
 		}
 
 	}

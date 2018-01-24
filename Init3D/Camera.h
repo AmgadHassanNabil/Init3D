@@ -8,6 +8,7 @@ using namespace DirectX;
 
 class Camera
 {
+	XMMATRIX camView;
 	
 	XMVECTOR camPosition;
 	XMVECTOR camTarget;
@@ -24,8 +25,6 @@ class Camera
 	float moveBackForward = 0.0f;
 	float xRotation = 0.0f;
 	float yRotation = 0.0f;
-	float moveAcceleration = 15;
-	float cameraRotationAcceleration = 0.005f;
 
 
 	
@@ -36,10 +35,13 @@ class Camera
 	void detectInput(const double & time, DIMOUSESTATE mouseCurrState, const BYTE currKeyboardState[]);
 
 public:
+	float moveAcceleration = 15;
+	float cameraRotationAcceleration = 0.005f;
+
+
 	Camera();
 	~Camera();
 	void update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[]);
-	XMMATRIX camView;
 	void getView(XMMATRIX &view) { view = this->camView; }
 
 };
