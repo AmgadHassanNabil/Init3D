@@ -23,7 +23,7 @@ class Game
 {
 private:
 
-	const FLOAT bgColor[4] = { 0.0f, 0.0f, 0.7f, 1.0f };
+	const FLOAT bgColor[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
 	UINT width, height;
 
 

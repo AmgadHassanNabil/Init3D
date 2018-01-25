@@ -47,6 +47,7 @@ HRESULT Model::loadFromFile(const char * fileName, Effect * effect, const UINT s
 	ZeroMemory(&vertexBufferData, sizeof(vertexBufferData));
 	vertexBufferData.pSysMem = modelVerticies;
 	hr = AMD3D->d3d11Device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &vertBuffer);
+	delete[] modelVerticies;
 	if (FAILED(hr)) return hr;
 
 	D3D11_BUFFER_DESC indexBufferDesc;
@@ -88,7 +89,6 @@ HRESULT Model::loadFromFile(const char * fileName, Effect * effect, const UINT s
 	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	hr = AMD3D->d3d11Device->CreateSamplerState(&sampDesc, &textureSamplerState);
 
-	delete[] modelVerticies;
 	return S_OK;
 }
 
