@@ -1,9 +1,18 @@
+struct Light
+{
+	float3 dir;
+	float4 ambient;
+	float4 diffuse;
+};
+
 cbuffer cbPerObject
 {
 	float4x4 WVP;
 	float4x4 World;
-	float3 lightDirection;
-	float padding;
+};
+cbuffer cbPerFrame
+{
+	Light light;
 };
 
 Texture2D ObjTexture;
@@ -31,8 +40,12 @@ float4 PS(VS_OUTPUT input) : SV_TARGET
 {
 	input.Normal = normalize(input.Normal);
 
-	float diffuse = dot(input.Normal, lightDirection) * 2;
-	float4 color = saturate(ObjTexture.Sample(ObjSamplerState, input.TexCoord) * diffuse);
-	color.a = 1;
-	return color;
+	float4 diffuse = ObjTexture.Sample(ObjSamplerState, input.TexCoord);
+
+	float3 finalColor;
+
+	finalColor = diffuse * light.ambient;
+	finalColor += saturate(dot(light.dir, input.Normal) * light.diffuse * diffuse);
+
+	return float4(finalColor, diffuse.a);
 }

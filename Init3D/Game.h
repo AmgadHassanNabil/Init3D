@@ -27,24 +27,43 @@ private:
 	UINT width, height;
 
 
-	Model model;
+	Model model, cube, cube2;
 	Effect* effect;
 
 	XMMATRIX WVP;
 	XMMATRIX World;
 	XMMATRIX camView;
 	XMMATRIX camProjection;
+	XMMATRIX cubeWorld;
+	XMMATRIX cube2World;
 
 	Camera camera;
+
+	struct Light
+	{
+		Light()
+		{
+			ZeroMemory(this, sizeof(Light));
+		}
+		XMFLOAT3 lightDirection;
+		float pad;
+		XMFLOAT4 ambient;
+		XMFLOAT4 diffuse;
+	};
 
 	struct cbPerObject
 	{
 		XMMATRIX  WVP;
 		XMMATRIX World;
-		XMFLOAT3 lightDirection;
-		float padding;
 	};
 
+	struct cbPerFrame
+	{
+		Light light;
+	};
+
+	ID3D11Buffer* cbPerFrameBuffer;
+	cbPerFrame cbPerFrame;
 	cbPerObject cbPerObj;
 
 	Game();

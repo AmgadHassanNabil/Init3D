@@ -21,15 +21,17 @@ class Model
 	Effect *effect;
 	ID3D11Buffer* cbPerObjectBuffer;
 
+	HRESULT createVertexAndIndexBuffers(ID3D11Device* device, VertexPositionNormalTexture* verticies, int numberOfVerticies, DWORD* indicies, int numberOfIndicies);
+
 	Model(const Model&);
 	Model& operator=(const Model&);
 public:
 	~Model();
 	Model();
 
-	HRESULT loadFromFile(const char* fileName, Effect *effect, const UINT sizeOfConstantBufferz);
-	HRESULT createTexturedCube(Effect *effect, const UINT sizeOfConstantBuffer);
-	void draw(const void* constantBufferData);
+	HRESULT loadFromFile(const char* fileName, ID3D11Device* device, Effect *effect, const UINT sizeOfConstantBufferz);
+	HRESULT createTexturedCube(Effect * effect, ID3D11Device* device, const wchar_t* textureName, const UINT sizeOfConstantBuffer);
+	void draw(ID3D11DeviceContext* d3d11DevCon, const void* constantBufferData);
 	void release();
 };
 

@@ -4,7 +4,7 @@ Model::Model()
 {
 }
 
-HRESULT Model::loadFromFile(const char * fileName, Effect * effect, const UINT sizeOfConstantBuffer)
+HRESULT Model::loadFromFile(const char * fileName, ID3D11Device* device, Effect * effect, const UINT sizeOfConstantBuffer)
 {
 	this->effect = effect;
 	FbxVector4* positions = NULL;
@@ -13,7 +13,7 @@ HRESULT Model::loadFromFile(const char * fileName, Effect * effect, const UINT s
 	DWORD numberOfNormals;
 	FbxVector2* uvs = NULL;
 
-	HRESULT hr = FBXImporter::getInstance()->parseFBX(AMD3D->d3d11Device, fileName,
+	HRESULT hr = FBXImporter::getInstance()->parseFBX(device, fileName,
 		&positions, numberOfVerticies,
 		&indiciesF, numberOfIndicies,
 		&normals, &uvs, textures, numberOfTextures);
@@ -33,37 +33,12 @@ HRESULT Model::loadFromFile(const char * fileName, Effect * effect, const UINT s
 	delete[] normals;
 	delete[] uvs;
 
-	D3D11_BUFFER_DESC vertexBufferDesc;
-	ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
-
-	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(VertexPositionNormalTexture) * numberOfVerticies;
-	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vertexBufferDesc.CPUAccessFlags = 0;
-	vertexBufferDesc.MiscFlags = 0;
-
-	D3D11_SUBRESOURCE_DATA vertexBufferData;
-
-	ZeroMemory(&vertexBufferData, sizeof(vertexBufferData));
-	vertexBufferData.pSysMem = modelVerticies;
-	hr = AMD3D->d3d11Device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &vertBuffer);
+	createVertexAndIndexBuffers(device, modelVerticies, numberOfVerticies, indiciesF, numberOfIndicies);
 	delete[] modelVerticies;
 	if (FAILED(hr)) return hr;
 
-	D3D11_BUFFER_DESC indexBufferDesc;
-	ZeroMemory(&indexBufferDesc, sizeof(indexBufferDesc));
-	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	indexBufferDesc.ByteWidth = sizeof(DWORD) * numberOfIndicies;
-	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	indexBufferDesc.CPUAccessFlags = 0;
-	indexBufferDesc.MiscFlags = 0;
 
-	D3D11_SUBRESOURCE_DATA iinitData;
-	iinitData.pSysMem = indiciesF;
-	hr = AMD3D->d3d11Device->CreateBuffer(&indexBufferDesc, &iinitData, &indexBuffer);
-	if (FAILED(hr)) return hr;
-
-	hr = AMD3D->d3d11Device->CreateInputLayout(VertexPositionNormalTexture::layout, VertexPositionNormalTexture::numElements, effect->VS_Buffer->GetBufferPointer(),
+	hr = device->CreateInputLayout(VertexPositionNormalTexture::layout, VertexPositionNormalTexture::numElements, effect->VS_Buffer->GetBufferPointer(),
 		effect->VS_Buffer->GetBufferSize(), &vertLayout);
 	if (FAILED(hr)) return hr;
 
@@ -74,7 +49,7 @@ HRESULT Model::loadFromFile(const char * fileName, Effect * effect, const UINT s
 	cbbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	cbbd.CPUAccessFlags = 0;
 	cbbd.MiscFlags = 0;
-	hr = AMD3D->d3d11Device->CreateBuffer(&cbbd, NULL, &cbPerObjectBuffer);
+	hr = device->CreateBuffer(&cbbd, NULL, &cbPerObjectBuffer);
 	if (FAILED(hr)) return hr;
 
 	D3D11_SAMPLER_DESC sampDesc;
@@ -87,13 +62,14 @@ HRESULT Model::loadFromFile(const char * fileName, Effect * effect, const UINT s
 	sampDesc.MaxAnisotropy = 4;
 	sampDesc.MinLOD = 0;
 	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-	hr = AMD3D->d3d11Device->CreateSamplerState(&sampDesc, &textureSamplerState);
+	hr = device->CreateSamplerState(&sampDesc, &textureSamplerState);
 
 	return S_OK;
 }
 
-HRESULT Model::createTexturedCube(Effect * effect, const UINT sizeOfConstantBuffer)
+HRESULT Model::createTexturedCube(Effect * effect, ID3D11Device* device, const wchar_t* textureName, const UINT sizeOfConstantBuffer)
 {
+	this->effect = effect;
 	VertexPositionNormalTexture cubeVerticies[] =
 	{
 		// Front Face
@@ -158,30 +134,64 @@ HRESULT Model::createTexturedCube(Effect * effect, const UINT sizeOfConstantBuff
 		20, 21, 22,
 		20, 22, 23
 	};
+
+	numberOfVerticies = 24;
+	numberOfIndicies = 36;
+
+	textures = new ID3D11ShaderResourceView*[1];
+	HRESULT hr = CreateWICTextureFromFile(device, &textureName[0], nullptr, &textures[0]);
+	if (FAILED(hr)) return hr;
+	hr = createVertexAndIndexBuffers(device, cubeVerticies, numberOfVerticies, indices, numberOfIndicies);
+	if (FAILED(hr)) return hr;
+	hr = device->CreateInputLayout(VertexPositionNormalTexture::layout, VertexPositionNormalTexture::numElements, effect->VS_Buffer->GetBufferPointer(),
+		effect->VS_Buffer->GetBufferSize(), &vertLayout);
+	if (FAILED(hr)) return hr;
+
+	D3D11_BUFFER_DESC cbbd;
+	ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
+	cbbd.Usage = D3D11_USAGE_DEFAULT;
+	cbbd.ByteWidth = sizeOfConstantBuffer;
+	cbbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbbd.CPUAccessFlags = 0;
+	cbbd.MiscFlags = 0;
+	hr = device->CreateBuffer(&cbbd, NULL, &cbPerObjectBuffer);
+	if (FAILED(hr)) return hr;
+
+	D3D11_SAMPLER_DESC sampDesc;
+	ZeroMemory(&sampDesc, sizeof(sampDesc));
+	sampDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_MIRROR;
+	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_MIRROR;
+	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
+	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	sampDesc.MaxAnisotropy = 4;
+	sampDesc.MinLOD = 0;
+	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	hr = device->CreateSamplerState(&sampDesc, &textureSamplerState);
 	return S_OK;
 }
 
-void Model::draw(const void* constantBufferData)
+void Model::draw(ID3D11DeviceContext* d3d11DevCon, const void* constantBufferData)
 {
-	AMD3D->d3d11DevCon->UpdateSubresource(cbPerObjectBuffer, 0, NULL, constantBufferData, 0, 0);
-	AMD3D->d3d11DevCon->VSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
-	AMD3D->d3d11DevCon->PSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
-	AMD3D->d3d11DevCon->PSSetShaderResources(0, 1, &textures[0]);
-	AMD3D->d3d11DevCon->PSSetSamplers(0, 1, &textureSamplerState);
+	d3d11DevCon->UpdateSubresource(cbPerObjectBuffer, 0, NULL, constantBufferData, 0, 0);
+	d3d11DevCon->VSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
+	//d3d11DevCon->PSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
+	d3d11DevCon->PSSetShaderResources(0, 1, &textures[0]);
+	d3d11DevCon->PSSetSamplers(0, 1, &textureSamplerState);
 
-	AMD3D->d3d11DevCon->VSSetShader(effect->VS, NULL, NULL);
-	AMD3D->d3d11DevCon->PSSetShader(effect->PS, NULL, NULL);
+	d3d11DevCon->VSSetShader(effect->VS, NULL, NULL);
+	d3d11DevCon->PSSetShader(effect->PS, NULL, NULL);
 
 	UINT stride = sizeof(VertexPositionNormalTexture);
 	UINT offset = 0;
-	AMD3D->d3d11DevCon->IASetVertexBuffers(0, 1, &vertBuffer, &stride, &offset);
-	AMD3D->d3d11DevCon->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	d3d11DevCon->IASetVertexBuffers(0, 1, &vertBuffer, &stride, &offset);
+	d3d11DevCon->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-	AMD3D->d3d11DevCon->IASetInputLayout(vertLayout);
+	d3d11DevCon->IASetInputLayout(vertLayout);
 
-	AMD3D->d3d11DevCon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	d3d11DevCon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	AMD3D->d3d11DevCon->DrawIndexed(numberOfIndicies, 0, 0);
+	d3d11DevCon->DrawIndexed(numberOfIndicies, 0, 0);
 }
 
 void Model::release()
@@ -196,6 +206,41 @@ void Model::release()
 	delete[] textures;
 }
 
+
+HRESULT Model::createVertexAndIndexBuffers(ID3D11Device * device, VertexPositionNormalTexture * verticies, int numberOfVerticies, DWORD * indicies, int numberOfIndicies)
+{
+	D3D11_BUFFER_DESC vertexBufferDesc;
+	ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
+
+	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.ByteWidth = sizeof(VertexPositionNormalTexture) * numberOfVerticies;
+	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.CPUAccessFlags = 0;
+	vertexBufferDesc.MiscFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA vertexBufferData;
+
+	ZeroMemory(&vertexBufferData, sizeof(vertexBufferData));
+	vertexBufferData.pSysMem = verticies;
+	HRESULT hr = device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &vertBuffer);
+
+	if (FAILED(hr)) return hr;
+
+	D3D11_BUFFER_DESC indexBufferDesc;
+	ZeroMemory(&indexBufferDesc, sizeof(indexBufferDesc));
+	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	indexBufferDesc.ByteWidth = sizeof(DWORD) * numberOfIndicies;
+	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	indexBufferDesc.CPUAccessFlags = 0;
+	indexBufferDesc.MiscFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA iinitData;
+	iinitData.pSysMem = indicies;
+	hr = device->CreateBuffer(&indexBufferDesc, &iinitData, &indexBuffer);
+	if (FAILED(hr)) return hr;
+
+	return S_OK;
+}
 
 Model::~Model()
 {

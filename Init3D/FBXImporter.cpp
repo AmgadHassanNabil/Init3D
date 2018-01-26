@@ -192,6 +192,7 @@ HRESULT FBXImporter::parseFBX(ID3D11Device* device, const char * fileName,
 
 			ON_FAIL_RETURN_HRESULT(loadVerteciesPositions(pMesh, verticiesPositions, numberOfVerticies));
 			ON_FAIL_RETURN_HRESULT(loadIndicies(pMesh, indicies, numberOfIndicies));
+			if (numberOfIndicies != numberOfVerticies) return E_FAIL;
 			ON_FAIL_RETURN_HRESULT(loadNormals(pMesh, normals));
 			ON_FAIL_RETURN_HRESULT(loadUVs(pMesh, uvs));
 			ON_FAIL_RETURN_HRESULT(loadTextures(device, pFbxScene, textureCount, outModelTextures));
