@@ -1,12 +1,12 @@
-#include "Camera.h"
+#include "FirstPersonCamera.h"
 
-Camera::Camera()
+FirstPersonCamera::FirstPersonCamera()
 {
 	camPosition = XMVectorSet(0, 0, 0, 0);
 	xRotation = yRotation = 0;
 }
 
-void Camera::detectInput(const double & time, DIMOUSESTATE mouseCurrState, const BYTE currKeyboardState[])
+void FirstPersonCamera::detectInput(const double & time, DIMOUSESTATE mouseCurrState, const BYTE currKeyboardState[])
 {
 	if ((currKeyboardState[DIK_W] & 0x80))
 		moveBackForward += time * moveAcceleration;
@@ -29,7 +29,7 @@ void Camera::detectInput(const double & time, DIMOUSESTATE mouseCurrState, const
 		mouseLastState = mouseCurrState;
 	}
 }
-void Camera::update(const double & time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[])
+void FirstPersonCamera::update(const double & time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[])
 {
 	detectInput(time, mouseCurrState, currKeyboardState);
 	camRotationMatrix = XMMatrixRotationRollPitchYaw(xRotation, yRotation, 0);
@@ -51,6 +51,6 @@ void Camera::update(const double & time, DIMOUSESTATE mouseCurrState, BYTE currK
 	camView = XMMatrixLookAtLH(camPosition, camTarget, camUp);
 }
 
-Camera::~Camera()
+FirstPersonCamera::~FirstPersonCamera()
 {
 }

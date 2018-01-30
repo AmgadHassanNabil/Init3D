@@ -152,18 +152,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="FirstPersonCamera.cpp" />
     <ClCompile Include="Direct3D.cpp" />
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="FBXImporter.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="ThirdPersonCamera.cpp" />
     <ClCompile Include="Vertices.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
+    <ClInclude Include="FirstPersonCamera.h" />
     <ClInclude Include="Direct3D.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="FBXImporter.h" />
@@ -171,6 +172,7 @@
     <ClInclude Include="Defines.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="ThirdPersonCamera.h" />
     <ClInclude Include="Vertices.h" />
     <ClInclude Include="WinMain.h" />
   </ItemGroup>

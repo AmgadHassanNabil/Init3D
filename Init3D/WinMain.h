@@ -3,7 +3,6 @@
 #include <windows.h>
 
 #include "Direct3D.h"
-#include "Camera.h"
 #include "Game.h"
 #include "Input.h"
 

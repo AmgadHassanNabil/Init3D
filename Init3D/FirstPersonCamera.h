@@ -6,7 +6,7 @@
 
 using namespace DirectX;
 
-class Camera
+class FirstPersonCamera
 {
 	XMMATRIX camView;
 	
@@ -28,8 +28,8 @@ class Camera
 
 
 	
-	Camera(const Camera&);
-	Camera& operator=(const Camera&);
+	FirstPersonCamera(const FirstPersonCamera&);
+	FirstPersonCamera& operator=(const FirstPersonCamera&);
 	
 
 	void detectInput(const double & time, DIMOUSESTATE mouseCurrState, const BYTE currKeyboardState[]);
@@ -39,10 +39,10 @@ public:
 	float cameraRotationAcceleration = 0.005f;
 
 
-	Camera();
-	~Camera();
+	FirstPersonCamera();
+	~FirstPersonCamera();
 	void update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[]);
-	void getView(XMMATRIX &view) { view = this->camView; }
+	inline void getView(XMMATRIX &view) { view = this->camView; }
 
 };
 

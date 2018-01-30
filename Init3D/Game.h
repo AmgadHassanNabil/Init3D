@@ -8,13 +8,14 @@
 #include <dinput.h>
 
 #include "Direct3D.h"
-#include "Camera.h"
+#include "FirstPersonCamera.h"
 #include "Vertices.h"
 #include "WICTextureLoader.h"
 #include "Input.h"
 #include "FBXImporter.h"
 #include "Model.h"
 #include "Effect.h"
+#include "ThirdPersonCamera.h"
 
 using namespace DirectX;
 
@@ -23,21 +24,20 @@ class Game
 {
 private:
 
-	const FLOAT bgColor[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
+	const FLOAT bgColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	UINT width, height;
 
 
-	Model model, cube, cube2;
+	Model model, cube[10][10];
 	Effect* effect;
 
 	XMMATRIX WVP;
 	XMMATRIX World;
 	XMMATRIX camView;
 	XMMATRIX camProjection;
-	XMMATRIX cubeWorld;
-	XMMATRIX cube2World;
+	XMMATRIX cubeWorld[10][10];
 
-	Camera camera;
+	ThirdPersonCamera camera;
 
 	struct Light
 	{
