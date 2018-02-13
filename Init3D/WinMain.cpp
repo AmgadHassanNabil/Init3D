@@ -49,7 +49,6 @@ int WINAPI WinMain(HINSTANCE hInstance,	HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Direct3D::getInstance()->shutdown();
 	Input::getInstance()->release();
 	FBXImporter::getInstance()->release();
-
 	return 0;
 }
 

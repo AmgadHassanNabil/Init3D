@@ -9,13 +9,11 @@
 
 #include "Direct3D.h"
 #include "FirstPersonCamera.h"
-#include "Vertices.h"
-#include "WICTextureLoader.h"
 #include "Input.h"
-#include "FBXImporter.h"
 #include "Model.h"
 #include "Effect.h"
 #include "ThirdPersonCamera.h"
+#include "Ship.h"
 
 using namespace DirectX;
 
@@ -27,15 +25,13 @@ private:
 	const FLOAT bgColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	UINT width, height;
 
-
-	Model model, cube[10][10];
+	Model cube[20][20];
 	Effect* effect;
 
 	XMMATRIX WVP;
-	XMMATRIX World;
 	XMMATRIX camView;
 	XMMATRIX camProjection;
-	XMMATRIX cubeWorld[10][10];
+	XMMATRIX cubeWorld[20][20];
 
 	ThirdPersonCamera camera;
 
@@ -62,6 +58,7 @@ private:
 		Light light;
 	};
 
+	Ship ship;
 	ID3D11Buffer* cbPerFrameBuffer;
 	cbPerFrame cbPerFrame;
 	cbPerObject cbPerObj;

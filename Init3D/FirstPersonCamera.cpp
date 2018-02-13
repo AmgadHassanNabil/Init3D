@@ -25,8 +25,6 @@ void FirstPersonCamera::detectInput(const double & time, DIMOUSESTATE mouseCurrS
 		yRotation += mouseLastState.lX * cameraRotationAcceleration;
 
 		xRotation += mouseCurrState.lY * cameraRotationAcceleration;
-
-		mouseLastState = mouseCurrState;
 	}
 }
 void FirstPersonCamera::update(const double & time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[])

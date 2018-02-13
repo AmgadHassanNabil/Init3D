@@ -1,7 +1,8 @@
 #pragma once
 #include <DirectXMath.h>
-#include <dinput.h>
+
 #include "Input.h"
+#include "Defines.h"
 
 using namespace DirectX;
 
@@ -13,14 +14,17 @@ class ThirdPersonCamera
 	XMVECTOR chaseDirection;
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
-	XMVECTOR desiredPositionOffset = XMVectorSet(0, 5, 20, 1);
+	XMVECTOR desiredPositionOffset;
 	XMVECTOR desiredPosition;
-	XMVECTOR lookAtOffset = XMVectorSet(0, 5, 0, 1);
+	XMVECTOR lookAtOffset;
 	XMVECTOR lookAt;
 
 	float stiffness = 1800.0f;
 	float damping = 600.0f;
 	float mass = 50.0f;
+	float cameraRotationAcceleration = 0.005f;
+
+	float xRotation, yRotation;
 
 	XMVECTOR position;
 	XMVECTOR velocity;
@@ -30,8 +34,9 @@ class ThirdPersonCamera
 
 public:
 	void reset();
+	void handleMouseInput(const double & time, const DIMOUSESTATE & mouseCurrState);
 	ThirdPersonCamera();
-	void update(const double & time, const XMVECTOR& referencePosition, const XMVECTOR& chaseDirection, const XMVECTOR& up);
+	void update(const double & time, const DIMOUSESTATE & mouseCurrState, const XMVECTOR& referencePosition, const XMVECTOR& chaseDirection, const XMVECTOR& up);
 	inline void getView(XMMATRIX &view) { view = this->view; }
 	~ThirdPersonCamera();
 };

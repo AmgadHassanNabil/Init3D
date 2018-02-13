@@ -29,7 +29,7 @@ public:
 	~Model();
 	Model();
 
-	HRESULT loadFromFile(const char* fileName, ID3D11Device* device, Effect *effect, const UINT sizeOfConstantBufferz);
+	HRESULT loadFromFile(const char* fileName, ID3D11Device* device, Effect *effect, const UINT sizeOfConstantBuffer);
 	HRESULT createTexturedCube(Effect * effect, ID3D11Device* device, const wchar_t* textureName, const UINT sizeOfConstantBuffer);
 	void draw(ID3D11DeviceContext* d3d11DevCon, const void* constantBufferData);
 	void release();

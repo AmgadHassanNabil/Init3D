@@ -14,8 +14,12 @@
 #define clamp(min, max, val) (val < min ? min : (val > max ? max : val))
 #define wrap(min, max, val) (val < min ? max : (val > max ? min : val))
 
-#define TRANSFORMATION_MATRIX(forward, up, right, translation)	XMMatrixSet(																			\
+#define TRANSFORMATION_MATRIX(forward, up, right, translation)	XMMatrixSet(																		\
 															XMVectorGetX(right),		XMVectorGetY(right),		XMVectorGetZ(right),		0,	\
 															XMVectorGetX(up),			XMVectorGetY(up),			XMVectorGetZ(up),			0,	\
 															XMVectorGetX(forward),		XMVectorGetY(forward),		XMVectorGetZ(forward),		0,	\
 															XMVectorGetX(translation),	XMVectorGetY(translation),	XMVectorGetZ(translation),	1)
+#define ABS(a)	(a < 0 ? -a : a)
+
+#define VALUE_IF_IN_THREASHOLD(value, threshold, toBeValue)	(ABS(value) < threshold) ? toBeValue : value
+
