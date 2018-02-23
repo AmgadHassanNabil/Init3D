@@ -4,7 +4,7 @@
 ThirdPersonCamera::ThirdPersonCamera()
 {
 	velocity = XMVectorSet(0, 0, 0, 0);
-	lookAtOffset = XMVectorSet(0, 5, 30, 0);
+	lookAtOffset = XMVectorSet(0, 5, 0, 0);
 	desiredPositionOffset = XMVectorSet(0, 5, 70, 0);
 	xRotation = yRotation = 0;
 }

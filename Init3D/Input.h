@@ -1,10 +1,11 @@
 #pragma once
 #include <dinput.h>
-
+#include<string.h>
 #include "Defines.h"
 
 #define AMINPUT			Input::getInstance()
 #define INPUT_DOWN(a)	a & 0x80
+#define INPUT_UP(a)		!INPUT_DOWN(a)
 
 class Input
 {
@@ -12,7 +13,7 @@ class Input
 	IDirectInputDevice8* DIMouse;
 
 	DIMOUSESTATE mouseLastState;
-	BYTE* lastKeyboardState;
+	BYTE lastKeyboardState[256];
 	LPDIRECTINPUT8 DirectInput;
 
 	Input();
@@ -24,7 +25,7 @@ public:
 
 	bool initDirectInput(HWND, HINSTANCE);
 	void detectInput(DIMOUSESTATE& mouseCurrState, BYTE currKeyboardState[]);
-	void setLastStates(DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[]) { this->mouseLastState = mouseCurrState; this->lastKeyboardState = currKeyboardState; }
+	inline void setLastStates(DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[]) { this->mouseLastState = mouseCurrState; memcpy(this->lastKeyboardState, currKeyboardState, sizeof(BYTE) * 256); }
 	void release();
 
 

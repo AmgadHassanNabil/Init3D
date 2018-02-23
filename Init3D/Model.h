@@ -8,7 +8,7 @@
 #include "Defines.h"
 #include "Direct3D.h"
 #include "Vertices.h"
-#include "Effect.h"
+#include "TexturedEffect.h"
 
 class Model
 {
@@ -18,7 +18,7 @@ class Model
 	ID3D11ShaderResourceView** textures;
 	DWORD numberOfVerticies, numberOfIndicies, numberOfTextures;
 	ID3D11SamplerState* textureSamplerState;
-	Effect *effect;
+	TexturedEffect *effect;
 	ID3D11Buffer* cbPerObjectBuffer;
 
 	HRESULT createVertexAndIndexBuffers(ID3D11Device* device, VertexPositionNormalTexture* verticies, int numberOfVerticies, DWORD* indicies, int numberOfIndicies);
@@ -29,8 +29,8 @@ public:
 	~Model();
 	Model();
 
-	HRESULT loadFromFile(const char* fileName, ID3D11Device* device, Effect *effect, const UINT sizeOfConstantBuffer);
-	HRESULT createTexturedCube(Effect * effect, ID3D11Device* device, const wchar_t* textureName, const UINT sizeOfConstantBuffer);
+	HRESULT loadFromFile(const char* fileName, ID3D11Device* device, Effect *effect);
+	HRESULT createTexturedCube(Effect * effect, ID3D11Device* device, const wchar_t* textureName);
 	void draw(ID3D11DeviceContext* d3d11DevCon, const void* constantBufferData);
 	void release();
 };

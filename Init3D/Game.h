@@ -11,7 +11,7 @@
 #include "FirstPersonCamera.h"
 #include "Input.h"
 #include "Model.h"
-#include "Effect.h"
+#include "TexturedEffect.h"
 #include "ThirdPersonCamera.h"
 #include "Ship.h"
 
@@ -26,7 +26,7 @@ private:
 	UINT width, height;
 
 	Model cube[20][20];
-	Effect* effect;
+	TexturedEffect* effect;
 
 	XMMATRIX WVP;
 	XMMATRIX camView;
@@ -35,33 +35,9 @@ private:
 
 	ThirdPersonCamera camera;
 
-	struct Light
-	{
-		Light()
-		{
-			ZeroMemory(this, sizeof(Light));
-		}
-		XMFLOAT3 lightDirection;
-		float pad;
-		XMFLOAT4 ambient;
-		XMFLOAT4 diffuse;
-	};
-
-	struct cbPerObject
-	{
-		XMMATRIX  WVP;
-		XMMATRIX World;
-	};
-
-	struct cbPerFrame
-	{
-		Light light;
-	};
-
 	Ship ship;
-	ID3D11Buffer* cbPerFrameBuffer;
-	cbPerFrame cbPerFrame;
-	cbPerObject cbPerObj;
+
+	
 
 	Game();
 	Game(const Game&);

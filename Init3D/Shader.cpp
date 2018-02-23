@@ -1,37 +1,26 @@
-#include "Effect.h"
+#include "Shader.h"
 
 
 
-Effect::Effect()
+Shader::Shader()
 {
+
 }
 
-Effect::Effect(LPCWSTR srcFile)
+void Shader::release()
 {
-	HRESULT hr;
-	
-	hr = CompileShader(srcFile, "VS", "vs_5_0", &VS_Buffer);
-	hr = CompileShader(srcFile, "PS", "ps_5_0", &PS_Buffer);
-
-	hr = AMD3D->d3d11Device->CreateVertexShader(VS_Buffer->GetBufferPointer(), VS_Buffer->GetBufferSize(), NULL, &VS);
-	hr = AMD3D->d3d11Device->CreatePixelShader(PS_Buffer->GetBufferPointer(), PS_Buffer->GetBufferSize(), NULL, &PS);
-}
-
-void Effect::release()
-{
-	VS_Buffer->Release();
-	PS_Buffer->Release();
+	Buffer->Release();
 	VS->Release();
 	PS->Release();
 }
 
 
 
-Effect::~Effect()
+Shader::~Shader()
 {
 }
 
-HRESULT Effect::CompileShader(_In_ LPCWSTR srcFile, _In_ LPCSTR entryPoint, _In_ LPCSTR profile, _Outptr_ ID3DBlob** blob)
+HRESULT Shader::CompileShader(_In_ LPCWSTR srcFile, _In_ LPCSTR entryPoint, _In_ LPCSTR profile, _Outptr_ ID3DBlob** blob)
 {
 	if (!srcFile || !entryPoint || !profile || !blob)
 		return E_INVALIDARG;
@@ -71,4 +60,10 @@ HRESULT Effect::CompileShader(_In_ LPCWSTR srcFile, _In_ LPCSTR entryPoint, _In_
 	*blob = shaderBlob;
 
 	return hr;
+}
+
+void Shader::apply()
+{
+	AMD3D->d3d11DevCon->UpdateSubresource(cbPerFrameBuffer, 0, NULL, pFrameData, 0, 0);
+	AMD3D->d3d11DevCon->PSSetConstantBuffers(0, 1, &cbPerFrameBuffer);
 }

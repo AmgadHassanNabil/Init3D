@@ -4,7 +4,7 @@ Model::Model()
 {
 }
 
-HRESULT Model::loadFromFile(const char * fileName, ID3D11Device* device, Effect * effect, const UINT sizeOfConstantBuffer)
+HRESULT Model::loadFromFile(const char * fileName, ID3D11Device* device, Effect * effect)
 {
 	this->effect = effect;
 	FbxVector4* positions = NULL;
@@ -45,7 +45,7 @@ HRESULT Model::loadFromFile(const char * fileName, ID3D11Device* device, Effect 
 	D3D11_BUFFER_DESC cbbd;
 	ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
 	cbbd.Usage = D3D11_USAGE_DEFAULT;
-	cbbd.ByteWidth = sizeOfConstantBuffer;
+	cbbd.ByteWidth = effect->getSizeOfPerObjectCB();
 	cbbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	cbbd.CPUAccessFlags = 0;
 	cbbd.MiscFlags = 0;
@@ -67,7 +67,7 @@ HRESULT Model::loadFromFile(const char * fileName, ID3D11Device* device, Effect 
 	return S_OK;
 }
 
-HRESULT Model::createTexturedCube(Effect * effect, ID3D11Device* device, const wchar_t* textureName, const UINT sizeOfConstantBuffer)
+HRESULT Model::createTexturedCube(Effect * effect, ID3D11Device* device, const wchar_t* textureName)
 {
 	this->effect = effect;
 	VertexPositionNormalTexture cubeVerticies[] =
@@ -150,7 +150,7 @@ HRESULT Model::createTexturedCube(Effect * effect, ID3D11Device* device, const w
 	D3D11_BUFFER_DESC cbbd;
 	ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
 	cbbd.Usage = D3D11_USAGE_DEFAULT;
-	cbbd.ByteWidth = sizeOfConstantBuffer;
+	cbbd.ByteWidth = effect->getSizeOfPerObjectCB();
 	cbbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	cbbd.CPUAccessFlags = 0;
 	cbbd.MiscFlags = 0;

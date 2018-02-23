@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\HLSL">
+      <UniqueIdentifier>{d6c5dac8-cca8-4c0e-aef6-21b6e554d490}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\HLSL\FireParticleSystem">
+      <UniqueIdentifier>{67ead39a-29c6-4680-bc09-e1d1f667a3dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\HLSL\FireParticleSystem\Draw">
+      <UniqueIdentifier>{29191750-2490-41e2-babb-6826cd88929c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\HLSL\FireParticleSystem\StreamOut">
+      <UniqueIdentifier>{e25843cd-d3c7-43b9-821c-4b13687b6ed0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -36,9 +48,6 @@
     <ClCompile Include="FBXImporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Effect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ThirdPersonCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -52,6 +61,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TexturedEffect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeometryShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PixelShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -80,9 +104,6 @@
     <ClInclude Include="Defines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Effect.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ThirdPersonCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -98,16 +119,49 @@
     <ClInclude Include="Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TexturedEffect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PixelShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Effects.fx">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\HLSL</Filter>
     </FxCompile>
     <FxCompile Include="TexturedEffect.fx">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="GSSO_FireParticleSystem.hlsl">
+      <Filter>Source Files\HLSL\FireParticleSystem\StreamOut</Filter>
+    </FxCompile>
+    <FxCompile Include="GSDraw_FireParticleSystem.hlsl">
+      <Filter>Source Files\HLSL\FireParticleSystem\Draw</Filter>
+    </FxCompile>
+    <FxCompile Include="PSDraw_FireParticleSystem.hlsl">
+      <Filter>Source Files\HLSL\FireParticleSystem\Draw</Filter>
+    </FxCompile>
+    <FxCompile Include="VSSO_FireParticleSystem.hlsl">
+      <Filter>Source Files\HLSL\FireParticleSystem\StreamOut</Filter>
+    </FxCompile>
+    <FxCompile Include="VSDraw_FireParticleSystem.hlsl">
+      <Filter>Source Files\HLSL\FireParticleSystem\Draw</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="ParticleSystemHeader.hlsli">
+      <Filter>Source Files\HLSL\FireParticleSystem</Filter>
+    </None>
   </ItemGroup>
 </Project>

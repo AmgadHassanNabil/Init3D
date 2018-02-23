@@ -104,14 +104,16 @@ bool Direct3D::initialize(HWND hwnd, HINSTANCE hInstance, const int width, const
 
 	d3d11DevCon->RSSetViewports(1, &viewport);
 
-	D3D11_RASTERIZER_DESC wfdesc;
-	ZeroMemory(&wfdesc, sizeof(D3D11_RASTERIZER_DESC));
-	wfdesc.FillMode = D3D11_FILL_SOLID;
-	wfdesc.CullMode = D3D11_CULL_NONE;
-	wfdesc.MultisampleEnable = TRUE;
-	wfdesc.AntialiasedLineEnable = TRUE;
-	hr = d3d11Device->CreateRasterizerState(&wfdesc, &WireFrame);
-	d3d11DevCon->RSSetState(WireFrame);
+	D3D11_RASTERIZER_DESC rasterizerDesc;
+	ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
+	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+	rasterizerDesc.MultisampleEnable = TRUE;
+	rasterizerDesc.AntialiasedLineEnable = TRUE;
+	hr = d3d11Device->CreateRasterizerState(&rasterizerDesc, &defaultRasterizerState);
+	d3d11DevCon->RSSetState(defaultRasterizerState);
+
+	createStockStates();
 
 	return true;
 }
@@ -123,10 +125,61 @@ void Direct3D::shutdown()
 	this->d3d11DevCon->Release();
 	this->depthStencilView->Release();
 	this->depthStencilBuffer->Release();
-	this->WireFrame->Release();
+	this->defaultRasterizerState->Release();
 	delete this;
 }
 
 Direct3D::~Direct3D()
 {
+}
+
+HRESULT Direct3D::createStockStates()
+{
+	// Clear the blend state description.
+	D3D11_BLEND_DESC blendStateDescription;
+	ZeroMemory(&blendStateDescription, sizeof(D3D11_BLEND_DESC));
+
+	// Create an alpha enabled blend state.
+	blendStateDescription.RenderTarget[0].BlendEnable = TRUE;
+	blendStateDescription.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	blendStateDescription.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendStateDescription.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendStateDescription.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendStateDescription.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendStateDescription.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendStateDescription.RenderTarget[0].RenderTargetWriteMask = 0x0f;
+
+	HRESULT hr = d3d11Device->CreateBlendState(&blendStateDescription, &m_alphaEnableBlendingState);
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	// Create an default disabled blend state.
+	blendStateDescription.RenderTarget[0].BlendEnable = FALSE;
+
+	hr = d3d11Device->CreateBlendState(&blendStateDescription, &m_defaultBlendingState);
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	ZeroMemory(&blendStateDescription, sizeof(D3D11_BLEND_DESC));
+
+	// Create an additive enabled blend state description.
+	blendStateDescription.RenderTarget[0].BlendEnable = TRUE;
+	blendStateDescription.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	blendStateDescription.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	blendStateDescription.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendStateDescription.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
+	blendStateDescription.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendStateDescription.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendStateDescription.RenderTarget[0].RenderTargetWriteMask = 0x0f;
+
+	hr = d3d11Device->CreateBlendState(&blendStateDescription, &m_additiveBlendingState);
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+	return S_OK;
 }

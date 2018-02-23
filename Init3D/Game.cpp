@@ -14,27 +14,17 @@ bool Game::initialize(UINT width, UINT height)
 	this->height = height;
 
 
-	effect = new Effect(L"TexturedEffect.fx");
+	effect = new TexturedEffect();
 	HRESULT hr = ship.initialize("D:\\Graphics\\302.fbx", effect);
 	if (FAILED(hr)) return false;
 	
 
 	camProjection = XMMatrixPerspectiveFovLH(0.4f*3.14f, (float)width / height, 1.0f, 10000.0f);
 
-	D3D11_BUFFER_DESC cbbd;
-	ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
 
-	cbbd.Usage = D3D11_USAGE_DEFAULT;
-	cbbd.ByteWidth = sizeof(cbPerFrame);
-	cbbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbbd.CPUAccessFlags = 0;
-	cbbd.MiscFlags = 0;
-
-	hr = AMD3D->d3d11Device->CreateBuffer(&cbbd, NULL, &cbPerFrameBuffer);
-
-	cbPerFrame.light.lightDirection = XMFLOAT3(0.3f, 0.5f, 0.2f);
-	cbPerFrame.light.ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	cbPerFrame.light.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	effect->frameConfigurations.light.lightDirection = XMFLOAT3(0.3f, 0.5f, 0.2f);
+	effect->frameConfigurations.light.ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	effect->frameConfigurations.light.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	for (int x = 0; x < 20; x++)
 		for (int y = 0; y < 20; y++)
@@ -46,6 +36,9 @@ bool Game::initialize(UINT width, UINT height)
 	return true;
 }
 
+int g = 0;
+
+bool flag = true;
 void Game::update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[])
 {
 
@@ -53,6 +46,27 @@ void Game::update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyb
 	{
 		int x = 0;
 	}
+	
+	
+	if (INPUT_DOWN(currKeyboardState[DIK_P]))
+	{
+		if (flag)
+		{
+			if (g == 0)
+				AMD3D->enableAlphaBlending();
+			else if (g == 1)
+				AMD3D->enableAdditiveBlending();
+			else if (g == 2)
+			{
+				g = -1;
+				AMD3D->enableDefaultBlending();
+			}
+			g++;
+		}
+		flag = false;
+	}
+	else
+		flag = true;
 
 	ship.update(time, mouseCurrState, currKeyboardState);
 	camera.update(time, mouseCurrState, ship.position, ship.direction, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
@@ -71,10 +85,7 @@ void Game::draw(const int& fps)
 	XMMATRIX VP = camView * camProjection;
 #endif
 	
-	AMD3D->d3d11DevCon->UpdateSubresource(cbPerFrameBuffer, 0, NULL, &cbPerFrame, 0, 0);
-	AMD3D->d3d11DevCon->PSSetConstantBuffers(0, 1, &cbPerFrameBuffer);
-
-	ship.draw(VP);
+	effect
 
 	for (int x = 0; x < 20; x++)
 	{
@@ -94,6 +105,7 @@ void Game::draw(const int& fps)
 
 	}
 
+	ship.draw(VP);
 
 	AMD3D->SwapChain->Present(0, 0);
 }
