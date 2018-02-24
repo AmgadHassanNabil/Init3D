@@ -14,7 +14,7 @@ bool Game::initialize(UINT width, UINT height)
 	this->height = height;
 
 
-	effect = new TexturedEffect();
+	effect = new TexturedEffect(AMD3D->d3d11Device);
 	HRESULT hr = ship.initialize("D:\\Graphics\\302.fbx", effect);
 	if (FAILED(hr)) return false;
 	
@@ -29,7 +29,7 @@ bool Game::initialize(UINT width, UINT height)
 	for (int x = 0; x < 20; x++)
 		for (int y = 0; y < 20; y++)
 		{
-			hr = cube[x][y].createTexturedCube(effect, AMD3D->d3d11Device, L"braynzar.jpg", sizeof(cbPerObject));
+			hr = cube[x][y].createTexturedCube(effect, AMD3D->d3d11Device, L"braynzar.jpg");
 			if (FAILED(hr)) return false;
 			cubeWorld[x][y] = XMMatrixScaling(10, 10, 10) * XMMatrixTranslation((x * 300) - 1500, 0, (y * 300) - 1500);
 		}
@@ -85,7 +85,7 @@ void Game::draw(const int& fps)
 	XMMATRIX VP = camView * camProjection;
 #endif
 	
-	effect
+	effect->apply();
 
 	for (int x = 0; x < 20; x++)
 	{
@@ -97,10 +97,10 @@ void Game::draw(const int& fps)
 #else
 			WVP = World * camView * camProjection
 #endif
-			cbPerObj.WVP = XMMatrixTranspose(WVP);
-			cbPerObj.World = XMMatrixTranspose(cubeWorld[x][y]);
+			effect->cbPerObj.WVP = XMMatrixTranspose(WVP);
+			effect->cbPerObj.World = XMMatrixTranspose(cubeWorld[x][y]);
 
-			cube[x][y].draw(AMD3D->d3d11DevCon, &cbPerObj);
+			cube[x][y].draw(AMD3D->d3d11DevCon);
 		}
 
 	}
@@ -112,7 +112,7 @@ void Game::draw(const int& fps)
 
 void Game::release()
 {
-	cbPerFrameBuffer->Release();
+	
 	for (int x = 0; x < 20; x++)
 		for (int y = 0; y < 20; y++)
 			cube[x][y].release();

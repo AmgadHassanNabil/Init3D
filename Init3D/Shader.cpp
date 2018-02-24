@@ -10,8 +10,6 @@ Shader::Shader()
 void Shader::release()
 {
 	Buffer->Release();
-	VS->Release();
-	PS->Release();
 }
 
 
@@ -60,10 +58,4 @@ HRESULT Shader::CompileShader(_In_ LPCWSTR srcFile, _In_ LPCSTR entryPoint, _In_
 	*blob = shaderBlob;
 
 	return hr;
-}
-
-void Shader::apply()
-{
-	AMD3D->d3d11DevCon->UpdateSubresource(cbPerFrameBuffer, 0, NULL, pFrameData, 0, 0);
-	AMD3D->d3d11DevCon->PSSetConstantBuffers(0, 1, &cbPerFrameBuffer);
 }

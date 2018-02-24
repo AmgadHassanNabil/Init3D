@@ -2,12 +2,22 @@
 
 
 
-void TexturedEffect::apply()
+void TexturedEffect::release()
 {
-	
+	vs->release();
+	delete vs;
+	ps->release();
+	delete ps;
+	cbPerFrameBuffer->Release();
 }
 
-TexturedEffect::TexturedEffect() : Effect(L"TexturedEffect.fx")
+void TexturedEffect::apply()
+{
+	pFrameData = &frameConfigurations;
+	Effect::apply();
+}
+
+TexturedEffect::TexturedEffect(ID3D11Device* d3d11Device)
 {
 	D3D11_BUFFER_DESC cbbd;
 	ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
@@ -18,7 +28,12 @@ TexturedEffect::TexturedEffect() : Effect(L"TexturedEffect.fx")
 	cbbd.CPUAccessFlags = 0;
 	cbbd.MiscFlags = 0;
 
-	HRESULT hr = AMD3D->d3d11Device->CreateBuffer(&cbbd, NULL, &cbPerFrameBuffer);
+	HRESULT hr = d3d11Device->CreateBuffer(&cbbd, NULL, &cbPerFrameBuffer);
+
+	vs = new VertexShader(L"TexturedEffect_VertexShader.hlsl", d3d11Device);
+	ps = new PixelShader(L"TexturedEffect_PixelShader.hlsl", d3d11Device);
+
+	this->sizeOfPerObjectCB = sizeof(cbPerObject);
 }
 
 

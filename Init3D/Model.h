@@ -29,9 +29,9 @@ public:
 	~Model();
 	Model();
 
-	HRESULT loadFromFile(const char* fileName, ID3D11Device* device, Effect *effect);
-	HRESULT createTexturedCube(Effect * effect, ID3D11Device* device, const wchar_t* textureName);
-	void draw(ID3D11DeviceContext* d3d11DevCon, const void* constantBufferData);
+	HRESULT loadFromFile(const char* fileName, ID3D11Device* device, TexturedEffect *effect);
+	HRESULT createTexturedCube(TexturedEffect * effect, ID3D11Device* device, const wchar_t* textureName);
+	void draw(ID3D11DeviceContext* d3d11DevCon);
 	void release();
 };
 

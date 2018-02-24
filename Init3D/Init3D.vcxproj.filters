@@ -25,6 +25,9 @@
     <Filter Include="Source Files\HLSL\FireParticleSystem\StreamOut">
       <UniqueIdentifier>{e25843cd-d3c7-43b9-821c-4b13687b6ed0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\HLSL\TexturedEffect">
+      <UniqueIdentifier>{74d381ef-7e0d-41db-ae8a-916ba1188a3b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -76,6 +79,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VertexShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Effect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -134,6 +140,9 @@
     <ClInclude Include="PixelShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Effect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Effects.fx">
@@ -156,6 +165,12 @@
     </FxCompile>
     <FxCompile Include="VSDraw_FireParticleSystem.hlsl">
       <Filter>Source Files\HLSL\FireParticleSystem\Draw</Filter>
+    </FxCompile>
+    <FxCompile Include="TexturedEffect_PixelShader.hlsl">
+      <Filter>Source Files\HLSL\TexturedEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="TexturedEffect_VertexShader.hlsl">
+      <Filter>Source Files\HLSL\TexturedEffect</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

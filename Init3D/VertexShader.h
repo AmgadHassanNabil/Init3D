@@ -6,7 +6,7 @@ class VertexShader :
 public:
 	ID3D11VertexShader * VS;
 
-	VertexShader(LPCWSTR srcFile);
+	VertexShader(LPCWSTR srcFile, ID3D11Device* d3d11Device);
 
 	void release() override;
 

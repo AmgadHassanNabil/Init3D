@@ -6,7 +6,7 @@ class PixelShader :
 public:
 	ID3D11PixelShader * PS;
 
-	PixelShader(LPCWSTR srcFile);
+	PixelShader(LPCWSTR srcFile, ID3D11Device* d3d11Device);
 	void release() override;
 	~PixelShader();
 };

@@ -3,9 +3,10 @@
 
 Logger logger;
 
-HRESULT Ship::initialize(const char* shipFilePath, Effect *effect)
+HRESULT Ship::initialize(const char* shipFilePath, TexturedEffect *effect)
 {
-	return model.loadFromFile(shipFilePath, AMD3D->d3d11Device, effect, sizeof(cbPerObject));
+	this->effect = effect;
+	return model.loadFromFile(shipFilePath, AMD3D->d3d11Device, effect);
 }
 void Ship::draw(const XMMATRIX& viewXProjection)
 {
@@ -14,11 +15,11 @@ void Ship::draw(const XMMATRIX& viewXProjection)
 #else
 	WVP = World * camView * camProjection
 #endif
-	constantBufferData.WVP = XMMatrixTranspose(WVP);
-	constantBufferData.World = XMMatrixTranspose(world);
+	effect->cbPerObj.WVP = XMMatrixTranspose(WVP);
+	effect->cbPerObj.World = XMMatrixTranspose(world);
 
 
-	model.draw(AMD3D->d3d11DevCon, &constantBufferData);
+	model.draw(AMD3D->d3d11DevCon);
 }
 
 void Ship::update(const double & time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[])
@@ -30,13 +31,11 @@ void Ship::update(const double & time, DIMOUSESTATE mouseCurrState, BYTE currKey
 	{
 		rotationAmount.x = -1.0f;
 		turnTilt = -0.008f;
-		logger.log("A");
 	}
 	if (INPUT_DOWN(currKeyboardState[DIK_D]))
 	{
 		rotationAmount.x = 1.0f;
 		turnTilt = 0.008f;
-		logger.log("D");
 	}
 	if (INPUT_DOWN(currKeyboardState[DIK_W]))
 		rotationAmount.y = 1.0f;
@@ -54,7 +53,7 @@ void Ship::update(const double & time, DIMOUSESTATE mouseCurrState, BYTE currKey
 	if (dot < 0.4)
 		turnTilt = 0;
 
-	//Obtain the angle between current Up vector, and World Up vector then linearly interpolate to this rotation
+	//Obtain the angle between current Up vector, and no Tilt Up vector then linearly interpolate to this rotation
 	if (rotationAmount.x == 0)
 	{
 		float upLength = XMVectorGetY(XMVector3Length(up));

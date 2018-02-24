@@ -3,17 +3,12 @@
 #include <dinput.h>
 #include "Input.h"
 #include "Model.h"
-#include "Effect.h"
+#include "Shader.h"
 
 using namespace DirectX;
 
 class Ship
 {
-	struct cbPerObject
-	{
-		XMMATRIX  WVP;
-		XMMATRIX World;
-	} constantBufferData;
 
 	const float RotationRate = 1.5f;
 	const float Mass = 1.0f;
@@ -28,7 +23,7 @@ class Ship
 	float turnTilt = 0;
 
 	Model model;
-	Effect * effect;
+	TexturedEffect * effect;
 
 	const XMVECTOR WorldUp = XMVectorSet(0, 1, 0, 0);
 	const XMVECTOR WorldRight = XMVectorSet(1, 0, 0, 0);
@@ -41,7 +36,7 @@ public:
 
 	Ship();
 	~Ship();
-	HRESULT initialize(const char* shipFilePath, Effect *effect);
+	HRESULT initialize(const char* shipFilePath, TexturedEffect *effect);
 	void update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[]);
 	void getWorld(XMMATRIX& world) { world = this->world; }
 	void draw(const XMMATRIX& viewXProjection);

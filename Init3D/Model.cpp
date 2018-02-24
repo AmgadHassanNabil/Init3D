@@ -4,7 +4,7 @@ Model::Model()
 {
 }
 
-HRESULT Model::loadFromFile(const char * fileName, ID3D11Device* device, Effect * effect)
+HRESULT Model::loadFromFile(const char * fileName, ID3D11Device* device, TexturedEffect * effect)
 {
 	this->effect = effect;
 	FbxVector4* positions = NULL;
@@ -38,8 +38,8 @@ HRESULT Model::loadFromFile(const char * fileName, ID3D11Device* device, Effect 
 	if (FAILED(hr)) return hr;
 
 
-	hr = device->CreateInputLayout(VertexPositionNormalTexture::layout, VertexPositionNormalTexture::numElements, effect->VS_Buffer->GetBufferPointer(),
-		effect->VS_Buffer->GetBufferSize(), &vertLayout);
+	hr = device->CreateInputLayout(VertexPositionNormalTexture::layout, VertexPositionNormalTexture::numElements, effect->vs->Buffer->GetBufferPointer(),
+		effect->vs->Buffer->GetBufferSize(), &vertLayout);
 	if (FAILED(hr)) return hr;
 
 	D3D11_BUFFER_DESC cbbd;
@@ -67,7 +67,7 @@ HRESULT Model::loadFromFile(const char * fileName, ID3D11Device* device, Effect 
 	return S_OK;
 }
 
-HRESULT Model::createTexturedCube(Effect * effect, ID3D11Device* device, const wchar_t* textureName)
+HRESULT Model::createTexturedCube(TexturedEffect * effect, ID3D11Device* device, const wchar_t* textureName)
 {
 	this->effect = effect;
 	VertexPositionNormalTexture cubeVerticies[] =
@@ -143,8 +143,8 @@ HRESULT Model::createTexturedCube(Effect * effect, ID3D11Device* device, const w
 	if (FAILED(hr)) return hr;
 	hr = createVertexAndIndexBuffers(device, cubeVerticies, numberOfVerticies, indices, numberOfIndicies);
 	if (FAILED(hr)) return hr;
-	hr = device->CreateInputLayout(VertexPositionNormalTexture::layout, VertexPositionNormalTexture::numElements, effect->VS_Buffer->GetBufferPointer(),
-		effect->VS_Buffer->GetBufferSize(), &vertLayout);
+	hr = device->CreateInputLayout(VertexPositionNormalTexture::layout, VertexPositionNormalTexture::numElements, effect->vs->Buffer->GetBufferPointer(),
+		effect->vs->Buffer->GetBufferSize(), &vertLayout);
 	if (FAILED(hr)) return hr;
 
 	D3D11_BUFFER_DESC cbbd;
@@ -171,16 +171,15 @@ HRESULT Model::createTexturedCube(Effect * effect, ID3D11Device* device, const w
 	return S_OK;
 }
 
-void Model::draw(ID3D11DeviceContext* d3d11DevCon, const void* constantBufferData)
+void Model::draw(ID3D11DeviceContext* d3d11DevCon)
 {
-	d3d11DevCon->UpdateSubresource(cbPerObjectBuffer, 0, NULL, constantBufferData, 0, 0);
+	d3d11DevCon->UpdateSubresource(cbPerObjectBuffer, 0, NULL, &effect->cbPerObj, 0, 0);
 	d3d11DevCon->VSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
-	//d3d11DevCon->PSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
 	d3d11DevCon->PSSetShaderResources(0, 1, &textures[0]);
 	d3d11DevCon->PSSetSamplers(0, 1, &textureSamplerState);
 
-	d3d11DevCon->VSSetShader(effect->VS, NULL, NULL);
-	d3d11DevCon->PSSetShader(effect->PS, NULL, NULL);
+	d3d11DevCon->VSSetShader(effect->vs->VS, NULL, NULL);
+	d3d11DevCon->PSSetShader(effect->ps->PS, NULL, NULL);
 
 	UINT stride = sizeof(VertexPositionNormalTexture);
 	UINT offset = 0;
