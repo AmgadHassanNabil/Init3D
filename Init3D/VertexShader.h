@@ -4,10 +4,10 @@ class VertexShader :
 	public Shader
 {
 public:
+	VertexShader();
 	ID3D11VertexShader * VS;
 
-	VertexShader(LPCWSTR srcFile, ID3D11Device* d3d11Device);
-
+	static HRESULT loadAndCreateVertexShader(LPCWSTR srcFile, ID3D11Device* d3d11Device, VertexShader & vs);
 	void release() override;
 
 	~VertexShader();

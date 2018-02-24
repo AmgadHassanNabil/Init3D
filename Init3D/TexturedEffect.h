@@ -1,5 +1,6 @@
 #pragma once
 #include "VertexShader.h"
+#include "Vertices.h"
 #include "PixelShader.h"
 #include "Effect.h"
 #include <DirectXMath.h>
@@ -33,13 +34,14 @@ public:
 	} cbPerObj;
 
 
-	VertexShader* vs;
-	PixelShader* ps;
+	VertexShader vs;
+	PixelShader ps;
 
 	void release();
 	void apply() override;
 
-	TexturedEffect(ID3D11Device* d3d11Device);
+	static HRESULT createTexturedEffect(_In_ ID3D11Device* d3d11Device, _Outref_ TexturedEffect& texturedEFfect);
+	TexturedEffect();
 	~TexturedEffect();
 };
 

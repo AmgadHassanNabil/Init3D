@@ -9,8 +9,6 @@ protected:
 public:
 	ID3DBlob* Buffer = NULL;
 	
-	
-	//virtual void apply();
 
 	Shader();
 	virtual void release();

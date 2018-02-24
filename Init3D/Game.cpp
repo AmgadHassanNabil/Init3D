@@ -13,23 +13,25 @@ bool Game::initialize(UINT width, UINT height)
 	this->width = width;
 	this->height = height;
 
+	HRESULT hr;
 
-	effect = new TexturedEffect(AMD3D->d3d11Device);
-	HRESULT hr = ship.initialize("D:\\Graphics\\302.fbx", effect);
+	hr =  TexturedEffect::createTexturedEffect(AMD3D->d3d11Device, effect);
+	if (FAILED(hr)) return false;
+	hr = ship.initialize("D:\\Graphics\\302.fbx", &effect);
 	if (FAILED(hr)) return false;
 	
 
 	camProjection = XMMatrixPerspectiveFovLH(0.4f*3.14f, (float)width / height, 1.0f, 10000.0f);
 
 
-	effect->frameConfigurations.light.lightDirection = XMFLOAT3(0.3f, 0.5f, 0.2f);
-	effect->frameConfigurations.light.ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	effect->frameConfigurations.light.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	effect.frameConfigurations.light.lightDirection = XMFLOAT3(0.3f, 0.5f, 0.2f);
+	effect.frameConfigurations.light.ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	effect.frameConfigurations.light.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	for (int x = 0; x < 20; x++)
 		for (int y = 0; y < 20; y++)
 		{
-			hr = cube[x][y].createTexturedCube(effect, AMD3D->d3d11Device, L"braynzar.jpg");
+			hr = cube[x][y].createTexturedCube(&effect, AMD3D->d3d11Device, L"braynzar.jpg");
 			if (FAILED(hr)) return false;
 			cubeWorld[x][y] = XMMatrixScaling(10, 10, 10) * XMMatrixTranslation((x * 300) - 1500, 0, (y * 300) - 1500);
 		}
@@ -85,7 +87,7 @@ void Game::draw(const int& fps)
 	XMMATRIX VP = camView * camProjection;
 #endif
 	
-	effect->apply();
+	effect.apply();
 
 	for (int x = 0; x < 20; x++)
 	{
@@ -97,8 +99,8 @@ void Game::draw(const int& fps)
 #else
 			WVP = World * camView * camProjection
 #endif
-			effect->cbPerObj.WVP = XMMatrixTranspose(WVP);
-			effect->cbPerObj.World = XMMatrixTranspose(cubeWorld[x][y]);
+			effect.cbPerObj.WVP = XMMatrixTranspose(WVP);
+			effect.cbPerObj.World = XMMatrixTranspose(cubeWorld[x][y]);
 
 			cube[x][y].draw(AMD3D->d3d11DevCon);
 		}
@@ -117,8 +119,7 @@ void Game::release()
 		for (int y = 0; y < 20; y++)
 			cube[x][y].release();
 	ship.release();
-	effect->release();
-	delete effect;
+	effect.release();
 	delete this;
 }
 

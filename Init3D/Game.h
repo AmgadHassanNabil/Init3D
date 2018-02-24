@@ -26,7 +26,7 @@ private:
 	UINT width, height;
 
 	Model cube[20][20];
-	TexturedEffect* effect;
+	TexturedEffect effect;
 
 	XMMATRIX WVP;
 	XMMATRIX camView;

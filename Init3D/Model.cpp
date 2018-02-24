@@ -38,9 +38,7 @@ HRESULT Model::loadFromFile(const char * fileName, ID3D11Device* device, Texture
 	if (FAILED(hr)) return hr;
 
 
-	hr = device->CreateInputLayout(VertexPositionNormalTexture::layout, VertexPositionNormalTexture::numElements, effect->vs->Buffer->GetBufferPointer(),
-		effect->vs->Buffer->GetBufferSize(), &vertLayout);
-	if (FAILED(hr)) return hr;
+	
 
 	D3D11_BUFFER_DESC cbbd;
 	ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
@@ -143,9 +141,6 @@ HRESULT Model::createTexturedCube(TexturedEffect * effect, ID3D11Device* device,
 	if (FAILED(hr)) return hr;
 	hr = createVertexAndIndexBuffers(device, cubeVerticies, numberOfVerticies, indices, numberOfIndicies);
 	if (FAILED(hr)) return hr;
-	hr = device->CreateInputLayout(VertexPositionNormalTexture::layout, VertexPositionNormalTexture::numElements, effect->vs->Buffer->GetBufferPointer(),
-		effect->vs->Buffer->GetBufferSize(), &vertLayout);
-	if (FAILED(hr)) return hr;
 
 	D3D11_BUFFER_DESC cbbd;
 	ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
@@ -178,15 +173,15 @@ void Model::draw(ID3D11DeviceContext* d3d11DevCon)
 	d3d11DevCon->PSSetShaderResources(0, 1, &textures[0]);
 	d3d11DevCon->PSSetSamplers(0, 1, &textureSamplerState);
 
-	d3d11DevCon->VSSetShader(effect->vs->VS, NULL, NULL);
-	d3d11DevCon->PSSetShader(effect->ps->PS, NULL, NULL);
+	d3d11DevCon->VSSetShader(effect->vs.VS, NULL, NULL);
+	d3d11DevCon->PSSetShader(effect->ps.PS, NULL, NULL);
 
 	UINT stride = sizeof(VertexPositionNormalTexture);
 	UINT offset = 0;
 	d3d11DevCon->IASetVertexBuffers(0, 1, &vertBuffer, &stride, &offset);
 	d3d11DevCon->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-	d3d11DevCon->IASetInputLayout(vertLayout);
+	d3d11DevCon->IASetInputLayout(effect->getInputLayout());
 
 	d3d11DevCon->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -197,7 +192,6 @@ void Model::release()
 {
 	vertBuffer->Release();
 	indexBuffer->Release();
-	vertLayout->Release();
 	cbPerObjectBuffer->Release();
 	textureSamplerState->Release();
 	for (int i = 0; i < numberOfTextures; i++)

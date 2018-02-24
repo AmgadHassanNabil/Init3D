@@ -4,9 +4,12 @@ class PixelShader :
 	public Shader
 {
 public:
+	PixelShader();
 	ID3D11PixelShader * PS;
 
-	PixelShader(LPCWSTR srcFile, ID3D11Device* d3d11Device);
+
+	static HRESULT loadAndCreatePixelShader(LPCWSTR srcFile, ID3D11Device* d3d11Device, PixelShader & ps);
+
 	void release() override;
 	~PixelShader();
 };

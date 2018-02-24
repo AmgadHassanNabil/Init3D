@@ -14,7 +14,7 @@ class Model
 {
 	ID3D11Buffer* vertBuffer;
 	ID3D11Buffer* indexBuffer;
-	ID3D11InputLayout* vertLayout;
+	
 	ID3D11ShaderResourceView** textures;
 	DWORD numberOfVerticies, numberOfIndicies, numberOfTextures;
 	ID3D11SamplerState* textureSamplerState;
