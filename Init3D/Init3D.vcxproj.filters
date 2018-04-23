@@ -19,12 +19,6 @@
     <Filter Include="Source Files\HLSL\FireParticleSystem">
       <UniqueIdentifier>{67ead39a-29c6-4680-bc09-e1d1f667a3dc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\HLSL\FireParticleSystem\Draw">
-      <UniqueIdentifier>{29191750-2490-41e2-babb-6826cd88929c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\HLSL\FireParticleSystem\StreamOut">
-      <UniqueIdentifier>{e25843cd-d3c7-43b9-821c-4b13687b6ed0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\HLSL\TexturedEffect">
       <UniqueIdentifier>{74d381ef-7e0d-41db-ae8a-916ba1188a3b}</UniqueIdentifier>
     </Filter>
@@ -82,6 +76,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Effect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleEffect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -143,6 +143,12 @@
     <ClInclude Include="Effect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleEffect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Effects.fx">
@@ -151,32 +157,23 @@
     <FxCompile Include="TexturedEffect.fx">
       <Filter>Source Files\HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="GSSO_FireParticleSystem.hlsl">
-      <Filter>Source Files\HLSL\FireParticleSystem\StreamOut</Filter>
-    </FxCompile>
-    <FxCompile Include="GSDraw_FireParticleSystem.hlsl">
-      <Filter>Source Files\HLSL\FireParticleSystem\Draw</Filter>
-    </FxCompile>
-    <FxCompile Include="PSDraw_FireParticleSystem.hlsl">
-      <Filter>Source Files\HLSL\FireParticleSystem\Draw</Filter>
-    </FxCompile>
-    <FxCompile Include="VSSO_FireParticleSystem.hlsl">
-      <Filter>Source Files\HLSL\FireParticleSystem\StreamOut</Filter>
-    </FxCompile>
-    <FxCompile Include="VSDraw_FireParticleSystem.hlsl">
-      <Filter>Source Files\HLSL\FireParticleSystem\Draw</Filter>
-    </FxCompile>
     <FxCompile Include="TexturedEffect_PixelShader.hlsl">
       <Filter>Source Files\HLSL\TexturedEffect</Filter>
     </FxCompile>
     <FxCompile Include="TexturedEffect_VertexShader.hlsl">
       <Filter>Source Files\HLSL\TexturedEffect</Filter>
     </FxCompile>
+    <FxCompile Include="VS_ParticleSystem.hlsl">
+      <Filter>Source Files\HLSL\FireParticleSystem</Filter>
+    </FxCompile>
+    <FxCompile Include="PS_ParticleSystem.hlsl">
+      <Filter>Source Files\HLSL\FireParticleSystem</Filter>
+    </FxCompile>
+    <FxCompile Include="GS_ParticleSystem.hlsl">
+      <Filter>Source Files\HLSL\FireParticleSystem</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="ParticleSystemHeader.hlsli">
-      <Filter>Source Files\HLSL\FireParticleSystem</Filter>
-    </None>
   </ItemGroup>
 </Project>

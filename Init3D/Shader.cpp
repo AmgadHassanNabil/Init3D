@@ -4,12 +4,13 @@
 
 Shader::Shader()
 {
-
+	Buffer = NULL;
 }
 
 void Shader::release()
 {
-	Buffer->Release();
+	if(Buffer)
+		Buffer->Release();
 }
 
 

@@ -60,3 +60,46 @@ struct VertexPositionNormalTexture
 
 	const static UINT numElements = ARRAYSIZE(layout);
 };
+
+//struct Particle
+//{
+//	XMFLOAT3 InitialPos;
+//	XMFLOAT3 InitialVel;
+//	XMFLOAT2 Size;
+//	float Age;
+//	unsigned int Type;
+//
+//	Particle()
+//	{	}
+//
+//	Particle(XMFLOAT3 InitialPos,
+//			XMFLOAT3 InitialVel,
+//			XMFLOAT2 Size,
+//			float Age,
+//			unsigned int Type)
+//	{	}
+//
+//	const static D3D11_INPUT_ELEMENT_DESC layout[5];
+//
+//	const static UINT numElements = ARRAYSIZE(layout);
+//};
+
+struct ParticleVertex
+{
+	XMFLOAT3 position;
+	XMFLOAT2 textureCoords;
+
+	ParticleVertex()
+	{	}
+	ParticleVertex(XMFLOAT3 InitialPos,
+		XMFLOAT2 textureCoords)
+		: position(InitialPos), textureCoords(textureCoords)
+	{	}
+	ParticleVertex(float x, float y, float z, float u, float v)
+		: position(x,y,z), textureCoords(u ,v)
+	{	}
+
+	const static D3D11_INPUT_ELEMENT_DESC layout[4];
+
+	const static UINT numElements = ARRAYSIZE(layout);
+};

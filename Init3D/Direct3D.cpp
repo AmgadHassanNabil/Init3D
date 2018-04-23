@@ -1,4 +1,5 @@
 #include "Direct3D.h"
+#include <CommonStates.h>
 
 Direct3D* Direct3D::instance;
 
@@ -36,7 +37,7 @@ bool Direct3D::initialize(HWND hwnd, HINSTANCE hInstance, const int width, const
 	swapChainDesc.Windowed = TRUE;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
-	hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, NULL, NULL,
+	hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, NULL, NULL,
 		D3D11_SDK_VERSION, &swapChainDesc, &SwapChain, &d3d11Device, NULL, &d3d11DevCon);
 
 
@@ -68,7 +69,7 @@ bool Direct3D::initialize(HWND hwnd, HINSTANCE hInstance, const int width, const
 		return false;
 
 	BackBuffer->Release();
-	
+
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
 	ZeroMemory(&depthStencilDesc, sizeof(D3D11_TEXTURE2D_DESC));
 	depthStencilDesc.Width = width;
@@ -113,7 +114,9 @@ bool Direct3D::initialize(HWND hwnd, HINSTANCE hInstance, const int width, const
 	hr = d3d11Device->CreateRasterizerState(&rasterizerDesc, &defaultRasterizerState);
 	d3d11DevCon->RSSetState(defaultRasterizerState);
 
-	createStockStates();
+
+	commonStates = new DirectX::CommonStates(d3d11Device);
+	//createStockStates();
 
 	return true;
 }
@@ -126,6 +129,7 @@ void Direct3D::shutdown()
 	this->depthStencilView->Release();
 	this->depthStencilBuffer->Release();
 	this->defaultRasterizerState->Release();
+	delete commonStates;
 	delete this;
 }
 

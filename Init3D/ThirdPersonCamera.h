@@ -38,6 +38,8 @@ public:
 	ThirdPersonCamera();
 	void update(const double & time, const DIMOUSESTATE & mouseCurrState, const XMVECTOR& referencePosition, const XMVECTOR& chaseDirection, const XMVECTOR& up);
 	inline void getView(XMMATRIX &view) { view = this->view; }
+	inline void getPosition(XMVECTOR& position) { position = this->position; }
+	inline void getUp(XMVECTOR& up) { up = this->up; }
 	~ThirdPersonCamera();
 };
 

@@ -175,6 +175,7 @@ void Model::draw(ID3D11DeviceContext* d3d11DevCon)
 
 	d3d11DevCon->VSSetShader(effect->vs.VS, NULL, NULL);
 	d3d11DevCon->PSSetShader(effect->ps.PS, NULL, NULL);
+	d3d11DevCon->GSSetShader(nullptr, nullptr, 0);
 
 	UINT stride = sizeof(VertexPositionNormalTexture);
 	UINT offset = 0;

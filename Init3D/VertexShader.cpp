@@ -4,6 +4,7 @@
 
 VertexShader::VertexShader()
 {
+	VS = nullptr;
 }
 
 HRESULT VertexShader::loadAndCreateVertexShader(_In_ LPCWSTR srcFile, _In_ ID3D11Device * d3d11Device, _Outref_ VertexShader & vs)
@@ -21,7 +22,8 @@ HRESULT VertexShader::loadAndCreateVertexShader(_In_ LPCWSTR srcFile, _In_ ID3D1
 void VertexShader::release()
 {
 	Shader::release();
-	VS->Release();
+	if(VS)
+		VS->Release();
 }
 
 

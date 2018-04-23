@@ -14,6 +14,8 @@
 #include "TexturedEffect.h"
 #include "ThirdPersonCamera.h"
 #include "Ship.h"
+#include "ParticleEffect.h"
+#include "ParticleSystem.h"
 
 using namespace DirectX;
 
@@ -26,7 +28,9 @@ private:
 	UINT width, height;
 
 	Model cube[20][20];
+
 	TexturedEffect effect;
+	ParticleEffect particleEffect;
 
 	XMMATRIX WVP;
 	XMMATRIX camView;
@@ -34,7 +38,7 @@ private:
 	XMMATRIX cubeWorld[20][20];
 
 	ThirdPersonCamera camera;
-
+	ParticleSystem particleSystem;
 	Ship ship;
 
 	

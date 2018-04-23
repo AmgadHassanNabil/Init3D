@@ -1,6 +1,9 @@
 #pragma once
 #include <windows.h>
 #include <d3d11.h>
+#include <CommonStates.h>
+
+using namespace DirectX;
 
 #define	AMD3D			Direct3D::getInstance()
 
@@ -8,6 +11,7 @@ class Direct3D
 {
 private:
 	static Direct3D* instance;
+	CommonStates * commonStates;
 
 	Direct3D();
 	Direct3D(const Direct3D&);
@@ -49,7 +53,8 @@ public:
 		blendFactor[2] = 0.0f;
 		blendFactor[3] = 0.0f;
 
-		d3d11DevCon->OMSetBlendState(m_defaultBlendingState, blendFactor, 0xffffffff);
+
+		d3d11DevCon->OMSetBlendState(commonStates->Opaque(), blendFactor, 0xffffffff);
 	}
 	inline void enableAlphaBlending()
 	{
@@ -60,9 +65,9 @@ public:
 		blendFactor[2] = 0.0f;
 		blendFactor[3] = 0.0f;
 
-		d3d11DevCon->OMSetBlendState(m_alphaEnableBlendingState, blendFactor, 0xffffffff);
+		d3d11DevCon->OMSetBlendState(commonStates->AlphaBlend(), blendFactor, 0xffffffff);
 	}
-	inline void enableAdditiveBlending() 
+	inline void enableAdditiveBlending()
 	{
 		float blendFactor[4];
 
@@ -71,7 +76,20 @@ public:
 		blendFactor[2] = 0.0f;
 		blendFactor[3] = 0.0f;
 
-		d3d11DevCon->OMSetBlendState(m_additiveBlendingState, blendFactor, 0xffffffff);
+		d3d11DevCon->OMSetBlendState(commonStates->Additive(), blendFactor, 0xffffffff);
+	}
+	 
+	inline void defaultDepth()
+	{
+		d3d11DevCon->OMSetDepthStencilState(commonStates->DepthDefault(), 0);
+	}
+	inline void disableDepth()
+	{
+		d3d11DevCon->OMSetDepthStencilState(commonStates->DepthNone(), 0);
+	}
+	inline void noDepthWrite()
+	{
+		d3d11DevCon->OMSetDepthStencilState(commonStates->DepthRead(), 0);
 	}
 };
 
