@@ -15,9 +15,12 @@ bool Game::initialize(UINT width, UINT height)
 
 	HRESULT hr;
 
+
+	hr = ParticleEffect::createParticleEffect(AMD3D->d3d11Device, particleEffect);
+	if (FAILED(hr)) return false;
 	hr =  TexturedEffect::createTexturedEffect(AMD3D->d3d11Device, effect);
 	if (FAILED(hr)) return false;
-	hr = ship.initialize("D:\\Graphics\\302.fbx", &effect);
+	hr = ship.initialize("D:\\Graphics\\302.fbx", L"fire.png", &effect, &particleEffect);
 	if (FAILED(hr)) return false;
 	
 
@@ -36,11 +39,6 @@ bool Game::initialize(UINT width, UINT height)
 			cubeWorld[x][y] = XMMatrixScaling(10, 10, 10) * XMMatrixTranslation((x * 300) - 1500, 0, (y * 300) - 1500);
 		}
 
-	hr = ParticleEffect::createParticleEffect(AMD3D->d3d11Device, particleEffect);
-	if (FAILED(hr)) return false;
-	hr = particleSystem.init(AMD3D->d3d11Device, &particleEffect, 50, L"fire.png");
-	if (FAILED(hr)) return false;
-
 	return true;
 }
 
@@ -48,6 +46,7 @@ int g = 0;
 
 double totalTime = 0;
 bool flag = true, thrust = false;
+float x = 0, y = 0, z = 0;
 void Game::update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[])
 {
 	
@@ -80,12 +79,21 @@ void Game::update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyb
 	else
 		flag = true;
 
-	if (time < 1)
-	{
-		particleSystem.update(time);
-		ship.update(time, mouseCurrState, currKeyboardState);
-		camera.update(time, mouseCurrState, ship.position, ship.direction, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
-	}
+	if (INPUT_DOWN(currKeyboardState[DIK_I]))
+		y += 0.1f;
+	if (INPUT_DOWN(currKeyboardState[DIK_K]))
+		y -= 0.1f;
+	if (INPUT_DOWN(currKeyboardState[DIK_J]))
+		x += 0.1f;
+	if (INPUT_DOWN(currKeyboardState[DIK_L]))
+		x -= 0.1f;
+	if (INPUT_DOWN(currKeyboardState[DIK_Y]))
+		z += 0.1f;
+	if (INPUT_DOWN(currKeyboardState[DIK_U]))
+		z -= 0.1f;
+
+	ship.update(time, mouseCurrState, currKeyboardState);
+	camera.update(time, mouseCurrState, ship.position, ship.direction, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
 }
 
 void Game::draw(const int& fps)
@@ -121,26 +129,14 @@ void Game::draw(const int& fps)
 
 	}
 
-	ship.draw(VP);
-
-	//if (thrust)
-	//{
-		AMD3D->enableAdditiveBlending();
-		AMD3D->disableDepth();
-		XMVECTOR camPos, camUp;
-		camera.getPosition(camPos);
-		camera.getUp(camUp);
-		XMFLOAT4 fCamPos;
-		XMFLOAT3 fCamUp;
-		XMStoreFloat4(&fCamPos, camPos);
-		XMStoreFloat3(&fCamUp, camUp);
-		particleSystem.draw(AMD3D->d3d11DevCon, VP, fCamPos, fCamUp);
-		AMD3D->enableDefaultBlending();
-		AMD3D->defaultDepth();
-	//}
-	
-	
-	
+	XMVECTOR camPos, camUp;
+	camera.getPosition(camPos);
+	camera.getUp(camUp);
+	XMFLOAT4 fCamPos;
+	XMFLOAT3 fCamUp;
+	XMStoreFloat4(&fCamPos, camPos);
+	XMStoreFloat3(&fCamUp, camUp);
+	ship.draw(VP, fCamPos, fCamUp);	
 
 	AMD3D->SwapChain->Present(0, 0);
 }
@@ -153,8 +149,7 @@ void Game::release()
 			cube[x][y].release();
 	ship.release();
 	effect.release();
-	//particleEffect.release();
-	//particleSystem.release();
+	particleEffect.release();
 	delete this;
 }
 

@@ -1,30 +1,33 @@
 cbuffer cbPerScene
 {
 	float4x4 WVP;
+
 	float billWidth;
 	float billHeight;
 	float2 pad1;
+
 	float3 camUp;
 	float timeSinceInception;
-	float4 camPos;
-};
 
-cbuffer cbDynamics
-{
+	float4 camPos;
+
 	float3 direction;
 	float ttl;
+
 	float2 endSize;
 	float2 pad2;
-	/*float ttl;
-	float3 Gravity;
-	float EndVelocity;
-	float4 MinColor;
-	float4 MaxColor;
 
-	float2 RotateSpeed;
-	float2 StartSize;
-	float2 EndSize;*/
+	float3 emitPosition;
+	float pad3;
 };
+
+//cbuffer cbDynamics
+//{
+//	float3 direction;
+//	float ttl;
+//	float2 endSize;
+//	float2 pad2;
+//};
 
 struct VS
 {
@@ -60,7 +63,7 @@ VS_OUT main(VS input)
 	VS_OUT output;
 	float age = timeSinceInception % (ttl * input.random.y);
 
-	float3 particlePosition = input.inceptionPosition + (direction * input.random.x * age);
+	float3 particlePosition = emitPosition + input.inceptionPosition + (direction * input.random.x * age);
 	float3 instancedPosition = particlePosition + input.position;
 
 	output.position = mul(float4(instancedPosition, 1), WVP);
@@ -69,7 +72,7 @@ VS_OUT main(VS input)
 	output.random = input.random;
 
 	float normalizedAge = saturate(age / ttl);
-	output.size = ComputeParticleSize(input.random.y, normalizedAge);
+	output.size = ComputeParticleSize(input.random.z, normalizedAge);
 
 	return output;
 }

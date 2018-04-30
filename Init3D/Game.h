@@ -15,7 +15,6 @@
 #include "ThirdPersonCamera.h"
 #include "Ship.h"
 #include "ParticleEffect.h"
-#include "ParticleSystem.h"
 
 using namespace DirectX;
 
@@ -38,7 +37,6 @@ private:
 	XMMATRIX cubeWorld[20][20];
 
 	ThirdPersonCamera camera;
-	ParticleSystem particleSystem;
 	Ship ship;
 
 	

@@ -1,12 +1,24 @@
 cbuffer cbPerObject
 {
 	float4x4 WVP;
+
 	float billWidth;
 	float billHeight;
 	float2 pad1;
+
 	float3 camUp;
 	float timeSinceInception;
+
 	float4 camPos;
+
+	float3 direction;
+	float ttl;
+
+	float2 endSize;
+	float2 pad2;
+
+	float3 emitPosition;
+	float pad3;
 }
 
 struct VS

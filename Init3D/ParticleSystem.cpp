@@ -48,29 +48,31 @@ HRESULT ParticleSystem::init(ID3D11Device* device, ParticleEffect* fx, UINT maxP
 	hr = device->CreateBuffer(&cbbd, NULL, &cbPerObjectBuffer);
 	ONFAIL_RELEASE_RETURN(hr, this);
 
-	ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
-	cbbd.Usage = D3D11_USAGE_DEFAULT;
-	cbbd.ByteWidth = sizeof(ParticleEffect::cbDynamics);
-	cbbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbbd.CPUAccessFlags = 0;
-	cbbd.MiscFlags = 0;
+	//ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
+	//cbbd.Usage = D3D11_USAGE_DEFAULT;
+	//cbbd.ByteWidth = sizeof(ParticleEffect::cbDynamics);
+	//cbbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	//cbbd.CPUAccessFlags = 0;
+	//cbbd.MiscFlags = 0;
 
-	ParticleEffect::cbDynamics dynamics;
-	dynamics.direction = XMFLOAT3(0, 0, 30);
-	dynamics.ttl = 1;
-	dynamics.endSize = XMFLOAT2(0.0f, 0.0f);
+	//ParticleEffect::cbDynamics dynamics;
+	//dynamics.direction = XMFLOAT3(0, 0, 40);
+	//dynamics.ttl = 1;
+	//dynamics.endSize = XMFLOAT2(0.0f, 0.0f);
 
-	D3D11_SUBRESOURCE_DATA dynamicsData;
-	dynamicsData.pSysMem = &dynamics;
+	//D3D11_SUBRESOURCE_DATA dynamicsData;
+	//dynamicsData.pSysMem = &dynamics;
 
-	hr = device->CreateBuffer(&cbbd, &dynamicsData, &cbDynamicsBuffer);
-	ONFAIL_RELEASE_RETURN(hr, this);
+	//hr = device->CreateBuffer(&cbbd, &dynamicsData, &cbDynamicsBuffer);
+	//ONFAIL_RELEASE_RETURN(hr, this);
 
 	buildVB(device);
 
-	mFX->objectConstantBuffer.billWidth = 2.5f;
-	mFX->objectConstantBuffer.billHeight = 2.5f;
-
+	mFX->objectConstantBuffer.billWidth = 2;
+	mFX->objectConstantBuffer.billHeight = 2;
+	mFX->objectConstantBuffer.direction = XMFLOAT3(0, 0, 40);
+	mFX->objectConstantBuffer.ttl = 1;
+	mFX->objectConstantBuffer.endSize = XMFLOAT2(0.0f, 0.0f);
 	size_t pathLength = std::wcslen(texturePath);
 
 	if(texturePath[pathLength - 3] == 'd' && texturePath[pathLength - 2] == 'd' && texturePath[pathLength - 1] == 's')
@@ -84,23 +86,25 @@ HRESULT ParticleSystem::init(ID3D11Device* device, ParticleEffect* fx, UINT maxP
 }
 
 
-void ParticleSystem::update(float dt)
+void ParticleSystem::update(float dt, const XMFLOAT3& direction, const XMFLOAT3& emitPosition)
 {
+	this->mEmitPosW = emitPosition;
+	this->mEmitDirW = direction;
+	mFX->objectConstantBuffer.direction = this->mEmitDirW;
+	mFX->objectConstantBuffer.emitPosition = this->mEmitPosW;
 	mAge += dt;
 }
 
 void ParticleSystem::draw(ID3D11DeviceContext* dc, const XMMATRIX& VP, const XMFLOAT4& camPos, const XMFLOAT3& camUp)
 {
-	int x = sizeof(mFX->objectConstantBuffer);
 	mFX->objectConstantBuffer.WVP = XMMatrixTranspose(VP);
 	mFX->objectConstantBuffer.camPos = camPos;
 	mFX->objectConstantBuffer.camUp = camUp;
 	mFX->objectConstantBuffer.timeSinceInception = mAge;
-
 	dc->UpdateSubresource(cbPerObjectBuffer, 0, NULL, &mFX->objectConstantBuffer, 0, 0);
 
 	dc->VSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
-	dc->VSSetConstantBuffers(1, 1, &cbDynamicsBuffer);
+	//dc->VSSetConstantBuffers(1, 1, &cbDynamicsBuffer);
 	dc->GSSetConstantBuffers(0, 1, &cbPerObjectBuffer);
 
 	dc->PSSetShaderResources(0, 1, &particleTexture);
@@ -140,7 +144,7 @@ HRESULT ParticleSystem::buildVB(ID3D11Device* device)
 		float randX = rand() % (high - low + 1) + low;
 		float randY = rand() % (high - low + 1) + low;
 		float randZ = rand() % (high - low + 1) + low;
-		particleInstances[i].pos = XMFLOAT3(randX + 18, randY - 3, randZ - 35);
+		particleInstances[i].pos = XMFLOAT3(randX, randY, randZ);
 
 		randX = ((float)rand() / (RAND_MAX)) + 0.01f;
 		randY = ((float)rand() / (RAND_MAX)) + 0.01f;

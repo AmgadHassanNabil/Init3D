@@ -133,10 +133,12 @@ int messageloop()
 			}
 
 			frameTime = GetFrameTime();
-
-			Game::getInstance()->update(frameTime, mouseCurrState, currKeyboardState);
-			Game::getInstance()->draw(fps);
-			Input::getInstance()->setLastStates(mouseCurrState, currKeyboardState);
+			if (frameTime < 1)
+			{
+				Game::getInstance()->update(frameTime, mouseCurrState, currKeyboardState);
+				Game::getInstance()->draw(fps);
+				Input::getInstance()->setLastStates(mouseCurrState, currKeyboardState);
+			}
 		}
 	}
 

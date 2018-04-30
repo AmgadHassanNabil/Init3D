@@ -11,5 +11,5 @@ struct VS
 
 float4 main(VS input) : SV_TARGET
 {
-	return particleTexture.Sample(linearSampler, input.texCoord);
+	return particleTexture.Sample(linearSampler, input.texCoord) * input.random.w;
 }

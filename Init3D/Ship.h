@@ -4,6 +4,8 @@
 #include "Input.h"
 #include "Model.h"
 #include "Shader.h"
+#include "ParticleEffect.h"
+#include "ParticleSystem.h"
 
 using namespace DirectX;
 
@@ -24,22 +26,25 @@ class Ship
 
 	Model model;
 	TexturedEffect * effect;
+	ParticleEffect * particleEffect;
+	ParticleSystem particleSystem;
 
 	const XMVECTOR WorldUp = XMVectorSet(0, 1, 0, 0);
 	const XMVECTOR WorldRight = XMVectorSet(1, 0, 0, 0);
-
+	XMVECTOR leftThrusterOffset = XMVectorSet(11.8, -2.6, 2.8, 0);
+	XMVECTOR rightThrusterOffset = XMVectorSet(12.6, -2.6, 2.8, 0);
 
 	void calculateAxes(XMVECTOR & direction, XMVECTOR & upNoTilt, XMVECTOR & up, XMVECTOR & right, XMVECTOR & rightNoTilt,
-						const XMMATRIX & xyRotationMatrix, const XMMATRIX &tiltMatrix);
+						const XMMATRIX & xyRotationMatrix, const XMMATRIX &tiltMatrix, XMMATRIX& xyzRotation);
 public:
 	XMVECTOR position, up, upNoTilt, direction, right, rightNoTilt, velocity;
 
 	Ship();
 	~Ship();
-	HRESULT initialize(const char* shipFilePath, TexturedEffect *effect);
+	HRESULT initialize(const char* shipFilePath, const wchar_t* texturePath, TexturedEffect *effect, ParticleEffect* particleEffect);
 	void update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[]);
 	void getWorld(XMMATRIX& world) { world = this->world; }
-	void draw(const XMMATRIX& viewXProjection);
+	void draw(const XMMATRIX& viewXProjection, const XMFLOAT4& fCamPos, XMFLOAT3& fCamUp);
 	void release();
 };
 

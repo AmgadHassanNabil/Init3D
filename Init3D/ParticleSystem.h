@@ -7,9 +7,14 @@
 
 using namespace DirectX;
 
-struct InstanceData
+struct Dynamics
 {
-	XMFLOAT3 inceptionPosition;
+	XMFLOAT3 velocity;
+	XMFLOAT2 endSize;
+	float ttl;
+	float particleWidth;
+	float particleHeight;
+	float spread;
 };
 
 class ParticleSystem
@@ -25,7 +30,7 @@ public:
 		const wchar_t* texturePath);
 	void release();
 
-	void update(float dt);
+	void update(float dt, const XMFLOAT3& direction, const XMFLOAT3& emitPosition);
 	void draw(ID3D11DeviceContext* dc, const XMMATRIX& VP, const XMFLOAT4& camPos, const XMFLOAT3& camUp);
 private:
 	ParticleSystem(const ParticleSystem& rhs);
@@ -39,7 +44,6 @@ private:
 	float mTimeStep;
 	float mAge;
 
-	XMFLOAT3 mEyePosW;
 	XMFLOAT3 mEmitPosW;
 	XMFLOAT3 mEmitDirW;
 	XMFLOAT3 eyePos;
@@ -53,7 +57,7 @@ private:
 	ID3D11ShaderResourceView* mTexArraySRV;
 	ID3D11ShaderResourceView* mRandomTexSRV;
 	ID3D11SamplerState* textureSamplerState;
-	ID3D11Buffer* cbPerObjectBuffer, *cbDynamicsBuffer;
+	ID3D11Buffer* cbPerObjectBuffer/*, *cbDynamicsBuffer*/;
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
 
 	HRESULT buildVB(ID3D11Device* device);

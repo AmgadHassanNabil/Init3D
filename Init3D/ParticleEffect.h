@@ -16,20 +16,33 @@ public:
 	struct cbPerObject
 	{
 		XMMATRIX WVP;
+
 		float billWidth;
 		float billHeight;
 		XMFLOAT2 pad1;
+
 		XMFLOAT3 camUp;
 		float timeSinceInception;
+
 		XMFLOAT4 camPos;
-	} objectConstantBuffer;
-	struct cbDynamics
-	{
+
 		XMFLOAT3 direction;
 		float ttl;
+
 		XMFLOAT2 endSize;
-		XMFLOAT2 rotateSpeed;
-	} objectDynamics;
+		XMFLOAT2 pad2;
+
+		XMFLOAT3 emitPosition;
+		float pad3;
+
+	} objectConstantBuffer;
+	//struct cbDynamics
+	//{
+	//	XMFLOAT3 direction;
+	//	float ttl;
+	//	XMFLOAT2 endSize;
+	//	XMFLOAT2 rotateSpeed;
+	//} objectDynamics;
 
 
 	VertexShader* drawVS;
