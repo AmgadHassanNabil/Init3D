@@ -27,7 +27,7 @@ public:
 
 	HRESULT init(ID3D11Device* device, ParticleEffect* fx,
 		UINT maxParticles,
-		const wchar_t* texturePath);
+		const wchar_t* texturePath, float spread);
 	void release();
 
 	void update(float dt, const XMFLOAT3& direction, const XMFLOAT3& emitPosition);
@@ -60,7 +60,7 @@ private:
 	ID3D11Buffer* cbPerObjectBuffer/*, *cbDynamicsBuffer*/;
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
 
-	HRESULT buildVB(ID3D11Device* device);
+	HRESULT buildVB(ID3D11Device* device, float spread);
 
 	struct InstanceData
 	{

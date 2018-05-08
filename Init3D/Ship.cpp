@@ -7,7 +7,7 @@ HRESULT Ship::initialize(const char* shipFilePath, const wchar_t* thrusterPartic
 {
 	this->effect = effect;
 
-	HRESULT hr = particleSystem.init(AMD3D->d3d11Device, particleEffect, 50, thrusterParticleTexturePath);
+	HRESULT hr = particleSystem.init(AMD3D->d3d11Device, particleEffect, 50, thrusterParticleTexturePath, 1);
 	if (FAILED(hr)) return hr;
 
 	return model.loadFromFile(shipFilePath, AMD3D->d3d11Device, effect);
@@ -34,7 +34,6 @@ void Ship::draw(const XMMATRIX& viewXProjection, const XMFLOAT4& fCamPos, XMFLOA
 	AMD3D->defaultDepth();
 }
 
-int leftThrusterAnimation = 40;
 void Ship::update(const double & time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[])
 {
 	XMFLOAT2 rotationAmount(0, 0);

@@ -19,7 +19,7 @@ ParticleSystem::~ParticleSystem()
 }
 
 
-HRESULT ParticleSystem::init(ID3D11Device* device, ParticleEffect* fx, UINT maxParticles, const wchar_t* texturePath)
+HRESULT ParticleSystem::init(ID3D11Device* device, ParticleEffect* fx, UINT maxParticles, const wchar_t* texturePath, float spread)
 {
 
 	D3D11_SAMPLER_DESC sampDesc;
@@ -66,7 +66,7 @@ HRESULT ParticleSystem::init(ID3D11Device* device, ParticleEffect* fx, UINT maxP
 	//hr = device->CreateBuffer(&cbbd, &dynamicsData, &cbDynamicsBuffer);
 	//ONFAIL_RELEASE_RETURN(hr, this);
 
-	buildVB(device);
+	buildVB(device, spread);
 
 	mFX->objectConstantBuffer.billWidth = 2;
 	mFX->objectConstantBuffer.billHeight = 2;
@@ -132,12 +132,12 @@ void ParticleSystem::draw(ID3D11DeviceContext* dc, const XMMATRIX& VP, const XMF
 	dc->DrawInstanced(1, mMaxParticles, 0, 0);
 }
 
-HRESULT ParticleSystem::buildVB(ID3D11Device* device)
+HRESULT ParticleSystem::buildVB(ID3D11Device* device, float spread)
 {
 
 	InstanceData* particleInstances = new InstanceData[mMaxParticles];
-	int high = 1;
-	int low = -1;
+	int high = spread;
+	int low = -spread;
 	srand(time(NULL));
 	for (int i = 0; i < mMaxParticles; i++)
 	{
