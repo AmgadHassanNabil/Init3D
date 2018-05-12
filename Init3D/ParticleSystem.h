@@ -27,8 +27,10 @@ public:
 
 	HRESULT init(ID3D11Device* device, ParticleEffect* fx,
 		UINT maxParticles,
-		const wchar_t* texturePath, float spread);
+		const wchar_t* texturePath, float spread, void(*creationCriteria)(int*, float*));
 	void release();
+
+	void setParticles(ID3D11DeviceContext* dc, int numberOfParticles, int spread);
 
 	void update(float dt, const XMFLOAT3& direction, const XMFLOAT3& emitPosition);
 	void draw(ID3D11DeviceContext* dc, const XMMATRIX& VP, const XMFLOAT4& camPos, const XMFLOAT3& camUp);
@@ -37,8 +39,14 @@ private:
 	ParticleSystem& operator=(const ParticleSystem& rhs);
 
 private:
+	struct InstanceData
+	{
+		XMFLOAT3 pos;
+		XMFLOAT4 random;
+	};
 
 	UINT mMaxParticles;
+	UINT currentNumberOfParticles;
 
 	float mGameTime;
 	float mTimeStep;
@@ -60,12 +68,8 @@ private:
 	ID3D11Buffer* cbPerObjectBuffer/*, *cbDynamicsBuffer*/;
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
 
-	HRESULT buildVB(ID3D11Device* device, float spread);
+	HRESULT buildVB(ID3D11Device* device, InstanceData* particleInstances, int mMaxParticles);
+	void generateParticles(InstanceData** particleInstances, int numberOfParticles, float spread);
 
-	struct InstanceData
-	{
-		XMFLOAT3 pos;
-		XMFLOAT4 random;
-	};
 };
 

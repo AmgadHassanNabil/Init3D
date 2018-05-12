@@ -1,16 +1,22 @@
 #include "Ship.h"
 #include "Logger.h"
 
-Logger logger;
+//Logger logger;
+
+#define ONFAIL_RELEASE_RETURN(hr, a)	if (FAILED(hr)) { a->release(); return hr; }
+#define SAFE_RELEASE(a)					if (a){ a.release(); }
 
 HRESULT Ship::initialize(const char* shipFilePath, const wchar_t* thrusterParticleTexturePath, TexturedEffect *effect, ParticleEffect* particleEffect)
 {
 	this->effect = effect;
 
-	HRESULT hr = particleSystem.init(AMD3D->d3d11Device, particleEffect, 50, thrusterParticleTexturePath, 1);
-	if (FAILED(hr)) return hr;
-
-	return model.loadFromFile(shipFilePath, AMD3D->d3d11Device, effect);
+	HRESULT hr = particleSystemLeft.init(AMD3D->d3d11Device, particleEffect, 100, thrusterParticleTexturePath, 1, NULL);
+	ONFAIL_RELEASE_RETURN(hr, this);
+	hr = particleSystemRight.init(AMD3D->d3d11Device, particleEffect, 100, thrusterParticleTexturePath, 1, NULL);
+	ONFAIL_RELEASE_RETURN(hr, this);
+	model.loadFromFile(shipFilePath, AMD3D->d3d11Device, effect);
+	ONFAIL_RELEASE_RETURN(hr, this);
+	return S_OK;
 }
 
 void Ship::draw(const XMMATRIX& viewXProjection, const XMFLOAT4& fCamPos, XMFLOAT3& fCamUp)
@@ -29,7 +35,8 @@ void Ship::draw(const XMMATRIX& viewXProjection, const XMFLOAT4& fCamPos, XMFLOA
 
 	AMD3D->enableAdditiveBlending();
 	AMD3D->noDepthWrite();
-	particleSystem.draw(AMD3D->d3d11DevCon, viewXProjection, fCamPos, fCamUp);
+	particleSystemLeft.draw(AMD3D->d3d11DevCon, viewXProjection, fCamPos, fCamUp);
+	particleSystemRight.draw(AMD3D->d3d11DevCon, viewXProjection, fCamPos, fCamUp);
 	AMD3D->enableDefaultBlending();
 	AMD3D->defaultDepth();
 }
@@ -117,17 +124,32 @@ void Ship::update(const double & time, DIMOUSESTATE mouseCurrState, BYTE currKey
 	}
 	else
 	{
-		if (leftThrusterAnimation > 40)
+		if (leftThrusterAnimation > 30)
 			leftThrusterAnimation--;
 	}
+	if (rotationAmount.x < 0)
+	{
+		if (rightThrusterAnimation < 60)
+			rightThrusterAnimation++;
+	}
+	else
+	{
+		if (rightThrusterAnimation > 30)
+			rightThrusterAnimation--;
+	}
 
-	XMFLOAT3 shipPosition, shipDirection;
+	XMFLOAT3 leftThrusterPosition, rightThrusterPosition, leftThrusterDirection, rightThrusterDirection;
 	leftThrusterOffset = XMVector3Transform(leftThrusterOffset, rotationMatrixWithTilt);
+	rightThrusterOffset = XMVector3Transform(rightThrusterOffset, rotationMatrixWithTilt);
 
-	XMStoreFloat3(&shipPosition, position + leftThrusterOffset);//rthruster(12.6, -2.6, 2.8) lthruster(11.8, -2.6, 2.8)
-	XMStoreFloat3(&shipDirection, direction * leftThrusterAnimation);
-	particleSystem.update(time, shipDirection, shipPosition);
+	XMStoreFloat3(&leftThrusterPosition, position + leftThrusterOffset);
+	XMStoreFloat3(&rightThrusterPosition, position + rightThrusterOffset);
+	XMStoreFloat3(&leftThrusterDirection, direction * leftThrusterAnimation);
+	XMStoreFloat3(&rightThrusterDirection, direction * rightThrusterAnimation);
+	particleSystemLeft.update(time, leftThrusterDirection, leftThrusterPosition);
+	particleSystemRight.update(time, rightThrusterDirection, rightThrusterPosition);
 }
+
 
 void Ship::calculateAxes(XMVECTOR & direction, XMVECTOR & upNoTilt, XMVECTOR & up, XMVECTOR & right, XMVECTOR & rightNoTilt, const XMMATRIX & xyRotationMatrix, const XMMATRIX & tiltMatrix, XMMATRIX& xyzRotation)
 {
@@ -148,7 +170,8 @@ void Ship::calculateAxes(XMVECTOR & direction, XMVECTOR & upNoTilt, XMVECTOR & u
 
 void Ship::release()
 {
-	particleSystem.release();
+	particleSystemLeft.release();
+	particleSystemRight.release();
 	model.release();
 }
 

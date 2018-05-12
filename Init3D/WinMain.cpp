@@ -3,8 +3,8 @@
 LPCTSTR WndClassName = "firstwindow";
 HWND hwnd = NULL;
 
-const int Width = 800;
-const int Height = 600;
+const int Width = 1024;
+const int Height = 768;
 
 
 double countsPerSecond = 0.0;

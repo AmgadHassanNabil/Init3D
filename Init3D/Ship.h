@@ -27,14 +27,16 @@ class Ship
 	Model model;
 	TexturedEffect * effect;
 	ParticleEffect * particleEffect;
-	ParticleSystem particleSystem;
+	ParticleSystem particleSystemLeft;
+	ParticleSystem particleSystemRight;
 
 	const XMVECTOR WorldUp = XMVectorSet(0, 1, 0, 0);
 	const XMVECTOR WorldRight = XMVectorSet(1, 0, 0, 0);
 
-	XMVECTOR leftThrusterOffset = XMVectorSet(11.8, -2.6, 2.8, 0);
-	XMVECTOR rightThrusterOffset = XMVectorSet(12.6, -2.6, 2.8, 0);
-	int leftThrusterAnimation = 40;
+	XMVECTOR leftThrusterOffset = XMVectorSet(11.8, -2.75, 2.5, 0);
+	XMVECTOR rightThrusterOffset = XMVectorSet(-11.8, -2.75, 2.5, 0);
+	int leftThrusterAnimation = 30;
+	int rightThrusterAnimation = 30;
 
 	void calculateAxes(XMVECTOR & direction, XMVECTOR & upNoTilt, XMVECTOR & up, XMVECTOR & right, XMVECTOR & rightNoTilt,
 						const XMMATRIX & xyRotationMatrix, const XMMATRIX &tiltMatrix, XMMATRIX& xyzRotation);

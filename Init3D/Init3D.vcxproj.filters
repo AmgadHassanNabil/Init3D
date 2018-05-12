@@ -172,6 +172,9 @@
     <FxCompile Include="GS_ParticleSystem.hlsl">
       <Filter>Source Files\HLSL\FireParticleSystem</Filter>
     </FxCompile>
+    <FxCompile Include="VS_InstancedParticleSystem.hlsl">
+      <Filter>Source Files\HLSL\FireParticleSystem</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

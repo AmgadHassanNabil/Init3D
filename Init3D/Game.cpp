@@ -14,7 +14,7 @@ bool Game::initialize(UINT width, UINT height)
 	this->height = height;
 
 	HRESULT hr;
-
+	srand(time(NULL));
 
 	hr = ParticleEffect::createParticleEffect(AMD3D->d3d11Device, particleEffect);
 	if (FAILED(hr)) return false;
