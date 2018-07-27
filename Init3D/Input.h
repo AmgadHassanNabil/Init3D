@@ -5,7 +5,7 @@
 
 #define AMINPUT			Input::getInstance()
 #define INPUT_DOWN(a)	a & 0x80
-#define INPUT_UP(a)		!INPUT_DOWN(a)
+#define INPUT_UP(a)		a == 0
 
 class Input
 {
@@ -26,6 +26,7 @@ public:
 	bool initDirectInput(HWND, HINSTANCE);
 	void detectInput(DIMOUSESTATE& mouseCurrState, BYTE currKeyboardState[]);
 	inline void setLastStates(DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[]) { this->mouseLastState = mouseCurrState; memcpy(this->lastKeyboardState, currKeyboardState, sizeof(BYTE) * 256); }
+
 	void release();
 
 
@@ -38,6 +39,6 @@ public:
 	IDirectInputDevice8* getKeyboard() const;
 	IDirectInputDevice8* getMouse() const;
 	inline void getLastMouseState(DIMOUSESTATE& mouseLastState) { mouseLastState = this->mouseLastState; }
-	inline void getLastKeyboardState(BYTE lastKeyboardState[]) { lastKeyboardState = this->lastKeyboardState; }
+	inline void getLastKeyboardState(BYTE **lastKeyboardState) { (*lastKeyboardState) = this->lastKeyboardState; }
 };
 

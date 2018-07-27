@@ -22,6 +22,9 @@
     <Filter Include="Source Files\HLSL\TexturedEffect">
       <UniqueIdentifier>{74d381ef-7e0d-41db-ae8a-916ba1188a3b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\HLSL\SpriteEffect">
+      <UniqueIdentifier>{b9980eb1-4fe6-4345-a46d-3c1b0c950158}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinMain.cpp">
@@ -82,6 +85,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ParticleEffect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteBatch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteEffect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -149,11 +161,17 @@
     <ClInclude Include="ParticleEffect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SpriteBatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteEffect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Effects.fx">
-      <Filter>Source Files\HLSL</Filter>
-    </FxCompile>
     <FxCompile Include="TexturedEffect.fx">
       <Filter>Source Files\HLSL</Filter>
     </FxCompile>
@@ -174,6 +192,12 @@
     </FxCompile>
     <FxCompile Include="VS_InstancedParticleSystem.hlsl">
       <Filter>Source Files\HLSL\FireParticleSystem</Filter>
+    </FxCompile>
+    <FxCompile Include="SpriteEffect_PixelShader.hlsl">
+      <Filter>Source Files\HLSL\SpriteEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="SpriteEffect_VertexShader.hlsl">
+      <Filter>Source Files\HLSL\SpriteEffect</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

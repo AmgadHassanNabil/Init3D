@@ -20,7 +20,7 @@ class ThirdPersonCamera
 	XMVECTOR lookAt;
 
 	float stiffness = 1800.0f;
-	float damping = 600.0f;
+	float damping = 300.0f;
 	float mass = 50.0f;
 	float cameraRotationAcceleration = 0.005f;
 
@@ -39,6 +39,7 @@ public:
 	void update(const double & time, const DIMOUSESTATE & mouseCurrState, const XMVECTOR& referencePosition, const XMVECTOR& chaseDirection, const XMVECTOR& up);
 	inline void getView(XMMATRIX &view) { view = this->view; }
 	inline void getPosition(XMVECTOR& position) { position = this->position; }
+	inline void getLookAt(XMVECTOR& lookAt) { lookAt = this->lookAt; }
 	inline void getUp(XMVECTOR& up) { up = this->up; }
 	~ThirdPersonCamera();
 };

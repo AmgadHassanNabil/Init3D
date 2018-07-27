@@ -31,6 +31,7 @@ public:
 	{
 		XMMATRIX  WVP;
 		XMMATRIX World;
+		bool isSelected;
 	} cbPerObj;
 
 

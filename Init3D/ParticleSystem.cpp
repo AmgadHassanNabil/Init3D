@@ -19,7 +19,7 @@ ParticleSystem::~ParticleSystem()
 }
 
 
-HRESULT ParticleSystem::init(ID3D11Device* device, ParticleEffect* fx, UINT maxParticles, const wchar_t* texturePath, float spread, void(*creationCriteria)(int*, float*))
+HRESULT ParticleSystem::init(ID3D11Device* device, ParticleEffect* fx, UINT maxParticles, const wchar_t* texturePath, float spread, void(*creationCriteria)(int*, float*, float))
 {
 
 	D3D11_SAMPLER_DESC sampDesc;
@@ -48,6 +48,7 @@ HRESULT ParticleSystem::init(ID3D11Device* device, ParticleEffect* fx, UINT maxP
 	hr = device->CreateBuffer(&cbbd, NULL, &cbPerObjectBuffer);
 	ONFAIL_RELEASE_RETURN(hr, this);
 
+	this->creationCriteria = creationCriteria;
 	//ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
 	//cbbd.Usage = D3D11_USAGE_DEFAULT;
 	//cbbd.ByteWidth = sizeof(ParticleEffect::cbDynamics);
@@ -66,12 +67,13 @@ HRESULT ParticleSystem::init(ID3D11Device* device, ParticleEffect* fx, UINT maxP
 	//hr = device->CreateBuffer(&cbbd, &dynamicsData, &cbDynamicsBuffer);
 	//ONFAIL_RELEASE_RETURN(hr, this);
 
-	InstanceData* particleInstances;
 	if (creationCriteria)
 		currentNumberOfParticles = 1;
 	else
 		currentNumberOfParticles = mMaxParticles;
-	generateParticles(&particleInstances, currentNumberOfParticles, spread);
+
+	particleInstances = new InstanceData[mMaxParticles];
+	generateParticles(particleInstances, currentNumberOfParticles, spread);
 	hr = buildVB(device, particleInstances, mMaxParticles);
 
 	ONFAIL_RELEASE_RETURN(hr, this);
@@ -103,6 +105,13 @@ void ParticleSystem::update(float dt, const XMFLOAT3& direction, const XMFLOAT3&
 
 void ParticleSystem::draw(ID3D11DeviceContext* dc, const XMMATRIX& VP, const XMFLOAT4& camPos, const XMFLOAT3& camUp)
 {
+	if (creationCriteria)
+	{
+		int numberOfParticles;
+		float spread;
+		creationCriteria(&numberOfParticles, &spread, mAge);
+		setParticles(dc, numberOfParticles, spread);
+	}
 	mFX->objectConstantBuffer.WVP = XMMatrixTranspose(VP);
 	mFX->objectConstantBuffer.camPos = camPos;
 	mFX->objectConstantBuffer.camUp = camUp;
@@ -140,9 +149,13 @@ void ParticleSystem::draw(ID3D11DeviceContext* dc, const XMMATRIX& VP, const XMF
 	dc->DrawInstanced(1, currentNumberOfParticles, 0, 0);
 }
 
-void ParticleSystem::generateParticles(InstanceData** particleInstances, int numberOfParticles, float spread)
+void ParticleSystem::reset()
 {
-	*particleInstances = new InstanceData[numberOfParticles];
+	mAge = 0;
+}
+
+void ParticleSystem::generateParticles(InstanceData* particleInstances, int numberOfParticles, float spread)
+{
 	int high = spread;
 	int low = -spread;
 	
@@ -152,13 +165,13 @@ void ParticleSystem::generateParticles(InstanceData** particleInstances, int num
 		float randX = RANDOM(low, high);
 		float randY = RANDOM(low, high);
 		float randZ = RANDOM(low, high);
-		(*particleInstances)[i].pos = XMFLOAT3(randX, randY, randZ);
+		particleInstances[i].pos = XMFLOAT3(randX, randY, randZ);
 
 		randX = RANDOM(0, 1) + 0.01f;
 		randY = RANDOM(0, 1) + 0.01f;
 		randZ = RANDOM(0, 1) + 0.01f;
 		float randW = RANDOM(0, 1) +0.01f;
-		(*particleInstances)[i].random = XMFLOAT4(randX, randY, randZ, randW);
+		particleInstances[i].random = XMFLOAT4(randX, randY, randZ, randW);
 	}
 }
 
@@ -178,7 +191,6 @@ HRESULT ParticleSystem::buildVB(ID3D11Device* device, InstanceData* particleInst
 	HRESULT hr = device->CreateBuffer(&instBuffDesc, &ginitInistanceData, &instanceBuffer);
 	ONFAIL_RELEASE_RETURN(hr, this);
 
-	delete particleInstances;
 
 	// Create the vertex buffer we will send to the shaders for the billboard data. We are going to use
 	// the instancing technique for the billboards, and our billboard geometry shader only requires a single
@@ -207,21 +219,21 @@ HRESULT ParticleSystem::buildVB(ID3D11Device* device, InstanceData* particleInst
 }
 
 
-void ParticleSystem::setParticles(ID3D11DeviceContext* dc, int numberOfParticles, int spread)
+void ParticleSystem::setParticles(ID3D11DeviceContext* dc, int numberOfParticles, float spread)
 {
 	if (numberOfParticles > mMaxParticles)
 		return;
 
-	InstanceData* particleInstances;
-	generateParticles(&particleInstances, numberOfParticles, spread);
+	generateParticles(particleInstances, numberOfParticles, spread);
 
 	dc->UpdateSubresource(instanceBuffer, 0, NULL, &particleInstances[0], 0, 0);
-	delete particleInstances;
 	currentNumberOfParticles = numberOfParticles;
 }
 
 void ParticleSystem::release()
 {
+	if(particleInstances)
+		delete particleInstances;
 	SAFE_RELEASE_N(vertexBuffer);
 	SAFE_RELEASE_N(instanceBuffer); 
 	SAFE_RELEASE_N(textureSamplerState);

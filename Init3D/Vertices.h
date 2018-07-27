@@ -27,11 +27,14 @@ struct VertexPositionColor
 
 struct VertexPositionTexture
 {
-	XMFLOAT3 pos;
+	XMFLOAT4 pos;
 	XMFLOAT2 texCoords;
 
+	VertexPositionTexture()
+	{   }
+
 	VertexPositionTexture(float x, float y, float z, float u, float v)
-		: pos(x, y, z), texCoords(u, v)
+		: pos(x, y, z, 1), texCoords(u, v)
 	{	}
 
 	const static D3D11_INPUT_ELEMENT_DESC layout[2];

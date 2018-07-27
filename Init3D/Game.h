@@ -15,6 +15,8 @@
 #include "ThirdPersonCamera.h"
 #include "Ship.h"
 #include "ParticleEffect.h"
+#include "SpriteBatch.h"
+#include "Ray.h"
 
 using namespace DirectX;
 
@@ -39,7 +41,8 @@ private:
 	ThirdPersonCamera camera;
 	Ship ship;
 
-	
+	Ray ray;
+	int selectedBox = -1;
 
 	Game();
 	Game(const Game&);
