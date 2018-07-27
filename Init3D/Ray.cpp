@@ -3,35 +3,39 @@
 #define max(a,b) a < b ? b : a
 #define min(a,b) a > b ? a : b
 
-//void Ray::pick(const int &sx, const int &sy, const XMMATRIX & projection, const XMMATRIX & view, const XMMATRIX & world, const int &mClientWidth, const int mClientHeight)
-//{
-//	XMFLOAT4X4 fProjection;
-//	XMStoreFloat4x4(&fProjection, projection);
-//	// Compute picking ray in view space.
-//	float vx = (+2.0f*sx / mClientWidth - 1.0f) / fProjection._11;
-//	float vy = (-2.0f*sy / mClientHeight + 1.0f) / fProjection._22;
-//	// Ray definition in view space.
-//	orig = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-//	dir = XMVectorSet(vx, vy, 1.0f, 0.0f);
-//
-//	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(view), view);
-//	XMMATRIX invWorld = XMMatrixInverse(&XMMatrixDeterminant(world), world);
-//	XMMATRIX toLocal = XMMatrixMultiply(invView, invWorld);
-//	orig = XMVector3TransformCoord(orig, toLocal);
-//	dir = XMVector3TransformNormal(dir, toLocal);
-//	// Make the ray direction unit length for the intersection tests.
-//	dir = XMVector3Normalize(rayDir);
-//}
+void Ray::pick(const int &sx, const int &sy, const XMMATRIX & projection, const XMMATRIX & view, const XMMATRIX & world, const int &mClientWidth, const int mClientHeight)
+{
+	XMFLOAT4X4 fProjection;
+	XMStoreFloat4x4(&fProjection, projection);
+
+	float vx = (+2.0f*sx / mClientWidth - 1.0f) / fProjection._11;
+	float vy = (-2.0f*sy / mClientHeight + 1.0f) / fProjection._22;
+
+	orig = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+	dir = XMVectorSet(vx, vy, 1.0f, 0.0f);
+
+	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(view), view);
+	XMMATRIX invWorld = XMMatrixInverse(&XMMatrixDeterminant(world), world);
+	XMMATRIX toLocal = XMMatrixMultiply(invView, invWorld);
+	orig = XMVector3TransformCoord(orig, toLocal);
+	dir = XMVector3TransformNormal(dir, toLocal);
+
+	dir = XMVector3Normalize(dir);
+	update();
+}
 
 
 bool Ray::intersect(const XMFLOAT3 AABBounds[2], float &distance) const
 {
 	float tmin, tmax, tymin, tymax, tzmin, tzmax;
+	XMFLOAT3 origF, invdirF;
+	XMStoreFloat3(&origF, orig);
+	XMStoreFloat3(&invdirF, invdir);
 
-	tmin = (AABBounds[sign[0]].x - orig.x) * invdir.x;
-	tmax = (AABBounds[1 - sign[0]].x - orig.x) * invdir.x;
-	tymin = (AABBounds[sign[1]].y - orig.y) * invdir.y;
-	tymax = (AABBounds[1 - sign[1]].y - orig.y) * invdir.y;
+	tmin = (AABBounds[sign[0]].x - origF.x) * invdirF.x;
+	tmax = (AABBounds[1 - sign[0]].x - origF.x) * invdirF.x;
+	tymin = (AABBounds[sign[1]].y - origF.y) * invdirF.y;
+	tymax = (AABBounds[1 - sign[1]].y - origF.y) * invdirF.y;
 
 	if ((tmin > tymax) || (tymin > tmax))
 		return false;
@@ -40,8 +44,8 @@ bool Ray::intersect(const XMFLOAT3 AABBounds[2], float &distance) const
 	if (tymax < tmax)
 		tmax = tymax;
 
-	tzmin = (AABBounds[sign[2]].z - orig.z) * invdir.z;
-	tzmax = (AABBounds[1 - sign[2]].z - orig.z) * invdir.z;
+	tzmin = (AABBounds[sign[2]].z - origF.z) * invdirF.z;
+	tzmax = (AABBounds[1 - sign[2]].z - origF.z) * invdirF.z;
 
 	if ((tmin > tzmax) || (tzmin > tmax))
 		return false;

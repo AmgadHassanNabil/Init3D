@@ -6,23 +6,27 @@ using namespace DirectX;
 
 class Ray
 {
+	XMVECTOR one = XMVectorSet(1, 1, 1, 1);
 public:
 	Ray() {}
-	Ray(const XMFLOAT3 &orig, const XMFLOAT3 &dir) : orig(orig), dir(dir)
+	Ray(const XMVECTOR &orig, const XMVECTOR &dir) : orig(orig), dir(dir)
 	{
-		invdir.x = 1 / dir.x;
-		invdir.y = 1 / dir.y;
-		invdir.z = 1 / dir.z;
-
-		sign[0] = (invdir.x < 0);
-		sign[1] = (invdir.y < 0);
-		sign[2] = (invdir.z < 0);
+		update();
 	}
-	XMFLOAT3 orig, dir;
-	XMFLOAT3 invdir;
+	XMVECTOR orig, dir;
+	XMVECTOR invdir;
 	int sign[3];
 
 	void pick(const int &sx, const int &sy, const XMMATRIX & projection, const XMMATRIX & view, const XMMATRIX & world, const int &mClientWidth, const int mClientHeight);
 	bool intersect(const XMFLOAT3 AABBounds[2], float &distance) const;
+
+	inline void update()
+	{
+		invdir = XMVectorDivide(one, dir);
+
+		sign[0] = (XMVectorGetX(invdir) < 0);
+		sign[1] = (XMVectorGetY(invdir) < 0);
+		sign[2] = (XMVectorGetZ(invdir) < 0);
+	}
 };
 

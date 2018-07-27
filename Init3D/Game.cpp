@@ -64,6 +64,10 @@ bool flag = true, thrust = false;
 float x = 0, y = 0, z = 0;
 void Game::update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[])
 {
+	if (INPUT_DOWN(currKeyboardState[DIK_B]))
+	{
+		int x = 0;
+	}
 	
 	if (INPUT_DOWN(currKeyboardState[DIK_X]))
 	{
@@ -103,56 +107,29 @@ void Game::update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyb
 		z -= 0.1f;
 	camera.getView(camView);
 
-	if (INPUT_DOWN(currKeyboardState[DIK_B]))
-	{
-		int x = 0;
-	}
-
-	XMFLOAT3 startPositionF, directionF, hitPoint;
 	XMVECTOR startPosition, direction;
 	float distance = 99999;
-	int x, y;
 	bool rayCollidedThisFrame = false;
 
-	//ray = Ray(XMFLOAT3(0 + y, 25, -75 + x), XMFLOAT3(-1, 0, 0));
+	ray.pick(mouseCurrState.lX + (width/ 2), mouseCurrState.lY + (height / 2), camProjection, camView, XMMatrixIdentity(), width, height);
 
-
-	//XMFLOAT3 min = XMFLOAT3(-100, 0, -100);
-	//XMFLOAT3 max = XMFLOAT3(-50, 50, -50);
-	
-
-	//if (ray.intersect(AABB))
-	//	selectedBox = 0;
-	//else
-	//	selectedBox = -1;
-
-	//ray.pick(mouseCurrState.lX + (width/ 2), mouseCurrState.lY + (width / 2), camProjection, camView, XMMatrixIdentity(), width, height);
-	camera.getPosition(startPosition);
-	XMVECTOR lookAt;
-	camera.getLookAt(lookAt);
-	XMVECTOR delta = lookAt - startPosition;
-	direction = XMVector3Normalize(delta);
-	XMStoreFloat3(&startPositionF, startPosition);
-	XMStoreFloat3(&directionF, direction);
-	ray = Ray(startPositionF, directionF);
-
-	for ( x = 0; x < NUMBER_BOXES; x++)
-		for ( y = 0; y < NUMBER_BOXES; y++)
+	for (int i = 0; i < NUMBER_BOXES; i++)
+		for (int j = 0; j < NUMBER_BOXES; j++)
 		{
-			XMFLOAT3 min = boxPosition(x, y);
-			min.x -= BOX_SIZE * 5;
-			min.y -= BOX_SIZE * 5;
-			min.z -= BOX_SIZE * 5;
+			XMFLOAT3 min = boxPosition(i, j);
+			min.x -= BOX_SIZE * 4;
+			min.y -= BOX_SIZE * 4;
+			min.z -= BOX_SIZE * 4;
 			XMFLOAT3 max = XMFLOAT3(min.x, min.y, min.z);
-			max.x += BOX_SIZE * 6;
-			max.y += BOX_SIZE * 6;
-			max.z += BOX_SIZE * 6;
+			max.x += BOX_SIZE * 5;
+			max.y += BOX_SIZE * 5;
+			max.z += BOX_SIZE * 5;
 			XMFLOAT3 AABB[] = { min, max };
 			float currDistance;
 
 			if (ray.intersect(AABB, currDistance))
 			{
-				selectedBox = x + y * NUMBER_BOXES;
+				selectedBox = i + j * NUMBER_BOXES;
 				distance = currDistance;
 				rayCollidedThisFrame = true;
 			}
