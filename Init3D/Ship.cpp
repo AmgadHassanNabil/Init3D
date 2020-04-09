@@ -36,6 +36,7 @@ HRESULT Ship::initialize(const char* shipFilePath, const char* missleFilePath, c
 
 
 float missleSpeed = 0.5;
+float missleThreshold = 0;
 
 void Ship::update(const double & time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[])
 {
@@ -124,9 +125,13 @@ void Ship::update(const double & time, DIMOUSESTATE mouseCurrState, BYTE currKey
 	if (INPUT_DOWN(currKeyboardState[DIK_R]) && INPUT_UP(lastKeyboardState[DIK_R]))
 	{
 		missleFired = true;
-		missleThrusterDirection = -direction;
+		if(targetIndex != -1)
+			missleThrusterDirection = -XMVector3NormalizeEst(position - targetPosition);
+		else
+			missleThrusterDirection = -direction;
 		missleSpeed = 0.0;
 		missleThrusterPosition = position + missleThrusterOffset;
+		missleThreshold = 0;
 	}
 
 	//Update thrusters
@@ -172,11 +177,15 @@ void Ship::update(const double & time, DIMOUSESTATE mouseCurrState, BYTE currKey
 	XMStoreFloat3(&missleThrusterOffsetF, missleThrusterPosition - (missleThrusterDirection * 11));
 	if (missleFired)
 	{
-		missleThrusterPosition += missleThrusterDirection * (missleSpeed += (1.2 * time));
+		missleThreshold += 0.5f * time;
+		missleThreshold = min(missleThreshold, 1);
+		XMVECTOR missleDirection = ((missleThrusterDirection * missleThreshold) + (-direction * (1 - missleThreshold)));
+
+		missleThrusterPosition += missleDirection * (missleSpeed += (1.2 * time));
 		XMFLOAT3 missleThrusterDirectionF;
-		XMStoreFloat3(&missleThrusterDirectionF, -missleThrusterDirection * 80);
+		XMStoreFloat3(&missleThrusterDirectionF, -missleDirection * 80);
 		particleSystemMissle.update(time, missleThrusterDirectionF, missleThrusterOffsetF);
-		missleWorld = TRANSFORMATION_MATRIX(missleThrusterDirection, WorldUp, XMVector3Cross(WorldUp, missleThrusterDirection), missleThrusterPosition);
+		missleWorld = TRANSFORMATION_MATRIX(missleDirection, WorldUp, XMVector3Cross(WorldUp, missleDirection), missleThrusterPosition);
 	}
 	else
 	{
@@ -184,6 +193,12 @@ void Ship::update(const double & time, DIMOUSESTATE mouseCurrState, BYTE currKey
 		missleThrusterPosition = position + missleThrusterOffset;
 		missleWorld = TRANSFORMATION_MATRIX(-direction, WorldUp, XMVector3Cross(WorldUp, missleThrusterDirection), missleThrusterPosition);
 	}
+}
+
+void Ship::setTarget(const XMFLOAT3 & targetPosition, const int & index)
+{
+	this->targetPosition=XMLoadFloat3(&targetPosition);
+	this->targetIndex = index;
 }
 
 void Ship::draw(const XMMATRIX& viewXProjection, const XMFLOAT4& fCamPos, XMFLOAT3& fCamUp)

@@ -23,6 +23,10 @@ double GetFrameTime();
 
 int WINAPI WinMain(HINSTANCE hInstance,	HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
+	int x = 0, i = 1;
+
+	x = i++ * ++i;
+	char b = 'a';
 	if (!InitializeWindow(hInstance, nShowCmd, Width, Height, true))
 	{
 		MessageBox(0, "Window Initialization - Failed", "Error", MB_OK);

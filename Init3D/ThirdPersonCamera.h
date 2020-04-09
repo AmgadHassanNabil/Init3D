@@ -20,7 +20,7 @@ class ThirdPersonCamera
 	XMVECTOR lookAt;
 
 	float stiffness = 1800.0f;
-	float damping = 300.0f;
+	float damping = 600.0f;
 	float mass = 50.0f;
 	float cameraRotationAcceleration = 0.005f;
 

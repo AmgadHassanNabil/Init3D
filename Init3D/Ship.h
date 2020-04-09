@@ -39,6 +39,9 @@ class Ship
 	const XMVECTOR WorldUp = XMVectorSet(0, 1, 0, 0);
 	const XMVECTOR WorldRight = XMVectorSet(1, 0, 0, 0);
 
+	XMVECTOR targetPosition;
+	int targetIndex;
+
 	XMVECTOR leftThrusterOffset = XMVectorSet(11.8, -2.75, 2.5, 0);
 	XMVECTOR rightThrusterOffset = XMVectorSet(-11.8, -2.75, 2.5, 0);
 	XMVECTOR mainThrusterOffset = XMVectorSet(0, -0.2, 9.0, 0);
@@ -60,6 +63,8 @@ public:
 	~Ship();
 	HRESULT initialize(const char* shipFilePath, const char* missleFilePath, const wchar_t* texturePath, TexturedEffect *effect, ParticleEffect* particleEffect);
 	void update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[]);
+	void setTarget(const XMFLOAT3& target, const int& index);
+
 	void getWorld(XMMATRIX& world) { world = this->world; }
 	void draw(const XMMATRIX& viewXProjection, const XMFLOAT4& fCamPos, XMFLOAT3& fCamUp);
 	void release();

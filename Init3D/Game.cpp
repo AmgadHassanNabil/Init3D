@@ -60,7 +60,7 @@ bool Game::initialize(UINT width, UINT height)
 int g = 0;
 
 double totalTime = 0;
-bool flag = true, thrust = false;
+bool flag = true, selected = false;
 float x = 0, y = 0, z = 0;
 void Game::update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyboardState[])
 {
@@ -69,10 +69,6 @@ void Game::update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyb
 		int x = 0;
 	}
 	
-	if (INPUT_DOWN(currKeyboardState[DIK_X]))
-	{
-		thrust = true;
-	}
 	if (INPUT_DOWN(currKeyboardState[DIK_P]))
 	{
 		if (flag)
@@ -105,37 +101,52 @@ void Game::update(const double& time, DIMOUSESTATE mouseCurrState, BYTE currKeyb
 		z += 0.1f;
 	if (INPUT_DOWN(currKeyboardState[DIK_U]))
 		z -= 0.1f;
+	if (mouseCurrState.rgbButtons[0] != 0 && selectedBox != -1)
+	{
+		selected = true;
+		int i = selectedBox % NUMBER_BOXES, j = selectedBox / NUMBER_BOXES;
+		ship.setTarget(boxPosition(i, j), selectedBox);
+	}
+	if (mouseCurrState.rgbButtons[1] != 0)
+	{
+		selected = false;
+		ship.setTarget(XMFLOAT3(0, 0, 0), -1);
+	}
+
 	camera.getView(camView);
+	
+	if (!selected)
+	{
+		XMVECTOR startPosition, direction;
+		float distance = 99999;
+		bool rayCollidedThisFrame = false;
 
-	XMVECTOR startPosition, direction;
-	float distance = 99999;
-	bool rayCollidedThisFrame = false;
+		ray.pick(mouseCurrState.lX + (width/ 2), mouseCurrState.lY + (height / 2), camProjection, camView, XMMatrixIdentity(), width, height);
 
-	ray.pick(mouseCurrState.lX + (width/ 2), mouseCurrState.lY + (height / 2), camProjection, camView, XMMatrixIdentity(), width, height);
-
-	for (int i = 0; i < NUMBER_BOXES; i++)
-		for (int j = 0; j < NUMBER_BOXES; j++)
-		{
-			XMFLOAT3 min = boxPosition(i, j);
-			min.x -= BOX_SIZE * 4;
-			min.y -= BOX_SIZE * 4;
-			min.z -= BOX_SIZE * 4;
-			XMFLOAT3 max = XMFLOAT3(min.x, min.y, min.z);
-			max.x += BOX_SIZE * 5;
-			max.y += BOX_SIZE * 5;
-			max.z += BOX_SIZE * 5;
-			XMFLOAT3 AABB[] = { min, max };
-			float currDistance;
-
-			if (ray.intersect(AABB, currDistance))
+		for (int i = 0; i < NUMBER_BOXES; i++)
+			for (int j = 0; j < NUMBER_BOXES; j++)
 			{
-				selectedBox = i + j * NUMBER_BOXES;
-				distance = currDistance;
-				rayCollidedThisFrame = true;
+				XMFLOAT3 min = boxPosition(i, j);
+				min.x -= BOX_SIZE * 4;
+				min.y -= BOX_SIZE * 4;
+				min.z -= BOX_SIZE * 4;
+				XMFLOAT3 max = XMFLOAT3(min.x, min.y, min.z);
+				max.x += BOX_SIZE * 5;
+				max.y += BOX_SIZE * 5;
+				max.z += BOX_SIZE * 5;
+				XMFLOAT3 AABB[] = { min, max };
+				float currDistance;
+
+				if (ray.intersect(AABB, currDistance))
+				{
+					selectedBox = i + j * NUMBER_BOXES;
+					distance = currDistance;
+					rayCollidedThisFrame = true;
+				}
 			}
-		}
-	if (!rayCollidedThisFrame)
-		selectedBox = -1;
+		if (!rayCollidedThisFrame)
+			selectedBox = -1;
+	}
 	ship.update(time, mouseCurrState, currKeyboardState);
 	camera.update(time, mouseCurrState, ship.position, ship.direction, XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)); 
 }
